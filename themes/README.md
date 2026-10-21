@@ -17,6 +17,8 @@ powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -TvHost 192.168.1.50 th
 | `default/` | The built-in look written out as JSON, as a starting point for your own |
 | `aurora/` | A dark aurora wallpaper (teal and violet on navy, darker at the bottom) with a matching background colour |
 | `dussehra/` | Festive skin for Dussehra (ends 21 Oct 2026): a marigold toran, a faint gold rangoli, a diya for Wi-Fi, a bell for Inputs, a marigold for Settings and a petal shower |
+| `mins-tv/` | A personal theme for a Sony KD-49X7500F: a pixel-art wallpaper (father and daughter at a street-food table) set in the top of the frame on a dark navy background, a four-app dock (YouTube, Netflix, Play Store, TV360) and every other Sony and Google app hidden |
+| `pixel/` | A retro 8-bit night skyline wallpaper with a matching navy background; the time-of-day backdrop stays off so the flat colours stay flat |
 | `six-columns/` | Six smaller tiles per row and one grid row visible under the dock |
 
 ## Keys

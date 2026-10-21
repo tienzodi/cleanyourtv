@@ -1,0 +1,23 @@
+{
+  "background_color": "#10141E",
+  "wallpaper": true,
+  "sky_intensity": 0,
+  "dock_apps": ["com.google.android.youtube.tv", "com.netflix.ninja", "com.android.vending", "com.viettel.tv360.tv"],
+  "fill_dock": false,
+  "hidden_apps": [
+    "com.amazon.amazonvideo.livingroom",
+    "com.google.android.play.games",
+    "com.google.android.videos",
+    "com.google.android.youtube.tvmusic",
+    "com.sony.dtv.kenhchonloc",
+    "com.sony.dtv.osat.music",
+    "com.sony.dtv.smarthelp",
+    "com.sony.dtv.smartmediaapp",
+    "com.sony.dtv.sonyselect",
+    "com.sony.dtv.timers",
+    "com.sony.dtv.tvx",
+    "com.sony.dtv.tvxlauncher.programguide",
+    "com.vewd.core.integration.dia",
+    "screnmirroring.com"
+  ]
+}

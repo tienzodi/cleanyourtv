@@ -24,5 +24,6 @@
     "com.sony.dtv.tvxlauncher.programguide",
     "com.vewd.core.integration.dia",
     "screnmirroring.com"
-  ]
+  ],
+  "advanced_effects": true
 }

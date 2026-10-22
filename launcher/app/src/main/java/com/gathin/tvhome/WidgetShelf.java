@@ -327,7 +327,7 @@ final class WidgetShelf {
     private void loadOrder() {
         order.clear();
         String saved = activity.getSharedPreferences(Config.SETTINGS_NAME, Context.MODE_PRIVATE)
-                .getString(ORDER_KEY, String.join(",", ALL));
+                .getString(ORDER_KEY, activity.getString(R.string.widget_order));
         for (String id : saved.split(",")) {
             id = id.trim();
             if (id.equals("now_playing")) id = AIR;   // the widget air quality replaced, in its place
@@ -457,6 +457,8 @@ final class WidgetShelf {
         editing = on;
         if (!on) drop();
         highlight.setColor(on ? palette.tertiary : palette.primary);
+        // The Add widget card appears and disappears with the mode.
+        if (lastGrid != null) align(lastGrid, lastColumns, lastDockTop);
     }
 
     /** The carried widget's name, or null. */
@@ -756,7 +758,7 @@ final class WidgetShelf {
      * Puts the shown cards over the dock's columns, left to right (each card's visible part exactly over
      * its tile, its focus room around it), and centres the shelf in the space above the dock. dockTop is
      * the dock's top in the shelf's parent, which also holds the grid. At most one card per column and
-     * four in all; a free column gets the Add widget card.
+     * four in all; in Edit Home a free column gets the Add widget card.
      */
     void align(RecyclerView grid, int columns, int dockTop) {
         lastGrid = grid;
@@ -765,7 +767,8 @@ final class WidgetShelf {
         if (!enabled) return;
         slots.clear();
         for (String id : order) if (slots.size() < slotsLimit()) slots.add(card(id));
-        if (slots.size() < slotsLimit() && order.size() < ALL.length) slots.add(addCard);
+        // The Add widget card takes a free column only in Edit Home; at rest the wallpaper shows there.
+        if (editing && slots.size() < slotsLimit() && order.size() < ALL.length) slots.add(addCard);
         for (WidgetCard c : allCards()) {
             int visibility = slots.contains(c) ? View.VISIBLE : View.GONE;
             if (c.getVisibility() != visibility) c.setVisibility(visibility);

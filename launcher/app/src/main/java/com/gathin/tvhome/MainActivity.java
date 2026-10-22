@@ -625,8 +625,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         // none published Home stayed in the old appearance until the process restarted.
         Palette.publish(start);
         if (shownPalette != Palette.current()) applyPalette(Palette.current());
-        // M3 surfaces carry no bloom: the focused app's colour glow stays off.
-        ambient.setVisibility(View.GONE);
+        // The focused app's colour glow stays on: it shows through the translucent widget cards and
+        // tints the backdrop as the focus moves along the dock.
 
         // Hide the glass when focus leaves the tiles.
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalFocusChangeListener((oldF, newF) -> {

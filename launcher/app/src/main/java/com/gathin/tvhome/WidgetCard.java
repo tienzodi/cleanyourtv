@@ -109,10 +109,14 @@ public final class WidgetCard extends FrameLayout {
         turning = false;
     }
 
+    /** Card fill opacity: enough to read the text, little enough that the wallpaper and the focused app's glow show through. */
+    private static final int FILL_ALPHA = 0xB8;
+
     void setPalette(Palette p) {
-        fill.setColor(p.surfaceContainer);
+        fill.setColor((p.surfaceContainer & 0x00FFFFFF) | (FILL_ALPHA << 24));
         outline.setColor(p.outlineVariant);
-        hole.setColor(p.surface);
+        // The empty slot at rest: a faint outline over the wallpaper, not a solid block.
+        hole.setColor((p.surface & 0x00FFFFFF) | (0x40 << 24));
         invalidate();
     }
 

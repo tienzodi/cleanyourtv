@@ -25,9 +25,10 @@ is reversible from the TV's own settings if the tools are gone.
 ## 2. Improve the launcher
 
 The launcher lives in `launcher/` and is deliberately small: plain Java, AndroidX RecyclerView and
-DynamicAnimation, no Kotlin, no Compose, no network. It targets TVs with 1 GB of RAM, so:
+DynamicAnimation, no Kotlin, no Compose. It targets TVs with 1 GB of RAM, so:
 
 - No blur, no video backgrounds, no polling, no background services.
+- No new network endpoints. The only ones are Open-Meteo and the IP-location services for the widgets, Cloudflare for the speed test the user starts, and this repo's GitHub releases from Launcher settings.
 - Anything that depends on a specific TV goes in `app/src/main/res/values/config.xml`, not in code.
 - Keep D-pad navigation deterministic. Test Up/Down/Left/Right from every edge.
 - Verify on a real TV, not only the emulator. The easiest way is remote key injection plus a

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Home</string>
+    <string name="app_name">km-launcher</string>
     <string name="inputs">Inputs</string>
     <string name="wifi">Wi-Fi</string>
     <string name="settings">Settings</string>
@@ -29,18 +29,12 @@
     <string name="vpn_off">VPN off</string>
     <string name="home_settings">Choose default home</string>
     <string name="home_settings_help">Select your original home to stop using CleanYourTV as Home, or CleanYourTV to switch back. The original launcher must be enabled and your TV must provide a home picker; use the restore script first if it was disabled.</string>
-    <string name="launcher_settings">Launcher settings</string>
+    <string name="launcher_settings">Quick settings</string>
     <string name="columns_label">Apps per row</string>
-    <string name="rows_below_dock_label">Rows below dock</string>
-    <string name="wallpaper_label">Wallpaper</string>
-    <string name="wallpaper_state">Wallpaper: %1$s</string>
-    <string name="wallpaper_none">None</string>
-    <string name="wallpaper_applied">Wallpaper changed</string>
-    <string name="wallpaper_theme_default">Theme default</string>
     <string name="animations_state">Animations: %1$s</string>
-    <string name="advanced_effects">Advanced effects</string>
+    <string name="advanced_effects">Expressive motion</string>
     <string name="advanced_effects_state">Advanced effects: %1$s</string>
-    <string name="advanced_effects_warning">Adds a lifted tile, icon zoom and smooth colour transitions. May increase memory use; the actual difference depends on your TV.</string>
+    <string name="advanced_effects_warning">Springier focus, a bigger zoom and morphing backdrop shapes. Turn off if Home stutters.</string>
     <string name="follow_theme">Follow theme (reset on-TV choices)</string>
     <string name="follow_theme_hint">Uses the current theme or built-in layout and motion settings. Pushing or resetting a theme also clears your on-TV choices.</string>
     <string name="tv_settings">TV system settings</string>
@@ -73,11 +67,7 @@
     <string name="card_state_new">New</string>
     <string name="card_state_new_key">New key</string>
     <string name="card_state_new_label">New name</string>
-    <string name="dock_edit">Edit dock</string>
-    <string name="dock_edit_hint">Choose the dock place to change and press OK. Back to finish.</string>
-    <string name="dock_edit_pick_app">Now choose the app to put there and press OK. Back to choose another place.</string>
     <string name="reorder">Reorder apps</string>
-    <string name="reorder_hint">OK picks up an app, arrows move it, Back places it. Back again to finish.</string>
     <string name="reorder_not_saved">Couldn\'t save the new order</string>
     <string name="app_library">App library</string>
     <string name="library_empty">No launchable apps found</string>
@@ -87,9 +77,9 @@
     <string name="library_open">Open</string>
     <string name="library_app_info">App info</string>
     <string name="library_save_failed">Could not save the shortcut</string>
-    <string name="library_recent">New · Add to Home</string>
-    <string name="library_hint_add">Press to add to Home · Hold for options</string>
-    <string name="library_hint_open">Press to open · Hold for options</string>
+    <string name="library_recent">New, add to Home</string>
+    <string name="library_hint_add">Press to add to Home, hold for options</string>
+    <string name="library_hint_open">Press to open, hold for options</string>
     <plurals name="library_app_count">
         <item quantity="one">%1$d app</item>
         <item quantity="other">%1$d apps</item>
@@ -97,14 +87,221 @@
     <!-- The greeting, then greeting_name: "Good morning, Mr. Trịnh". -->
     <string name="greeting_with_name">%1$s, %2$s</string>
 
-    <!-- Race-weekend panel (RaceWeekend). Session names come from the calendar. -->
-    <string name="race_kicker">Round %1$d · %2$s · %3$s</string>
-    <string name="race_kicker_no_place">Round %1$d · %2$s</string>
-    <string name="race_next">%1$s in %2$s</string>
-    <string name="race_lights_out">Lights out in %1$s</string>
-    <string name="race_live">%1$s · live</string>
-    <string name="race_finished">Chequered flag</string>
-    <!-- Cinematic top shelf (cinematic_home): the line under the focused dock app's name; %1$s is when it was
-         last opened, e.g. "5 minutes ago" or "yesterday, 9:40 pm". -->
-    <string name="last_opened">Last opened %1$s</string>
+    <!-- Home widgets (WidgetShelf) -->
+    <string name="widgets">Widgets</string>
+    <string name="weather">Weather</string>
+    <string name="widget_system">This TV</string>
+    <string name="widget_ram">Memory</string>
+    <string name="widget_storage">Storage</string>
+    <string name="widget_used_of">%1$s / %2$s</string>
+    <string name="lunar_calendar">Lunar calendar</string>
+    <string name="lunar_year">Lunar year %s</string>
+    <string name="lunar_leap">%s (leap)</string>
+    <string name="holiday_in_days">%1$s in %2$d days</string>
+    <string name="holiday_tomorrow">%s is tomorrow</string>
+    <string name="holiday_today">%s is today</string>
+    <string name="holiday_new_year">New Year\'s Day</string>
+    <string name="holiday_tet">Tết</string>
+    <string name="holiday_hung_kings">Hùng Kings\' Day</string>
+    <string name="holiday_reunification">Reunification Day</string>
+    <string name="holiday_labour">Labour Day</string>
+    <string name="holiday_mid_autumn">Mid-Autumn Festival</string>
+    <string name="holiday_national_day">National Day</string>
+    <string name="holiday_christmas">Christmas</string>
+    <string name="weather_clear">Clear</string>
+    <string name="weather_partly">Partly cloudy</string>
+    <string name="weather_cloudy">Cloudy</string>
+    <string name="weather_fog">Fog</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_thunder">Thunderstorm</string>
+    <string name="weather_range">%1$s, %2$d° / %3$d°</string>
+    <string name="weather_feels">Feels like</string>
+    <string name="weather_details">Humidity %1$d%%, wind %2$d km/h</string>
+    <string name="weather_details_mph">Humidity %1$d%%, wind %2$d mph</string>
+    <string name="weather_tomorrow">%s tomorrow</string>
+    <string name="weather_tomorrow_detail">Low %1$d°, %2$d%% rain</string>
+    <string name="weather_offline">Can\'t reach the weather service</string>
+    <string name="widget_add">Add widget</string>
+    <string name="widget_remove">Remove</string>
+
+    <!-- Edit Home (apps, dock and widgets) -->
+    <string name="edit_home">Edit Home</string>
+    <string name="edit_home_done">Done editing</string>
+    <string name="edit_home_moving">Moving %s</string>
+    <string name="edit_home_hint">OK picks up an app or widget. The top row is the dock. Back to finish.</string>
+    <string name="edit_home_hint_carrying">Arrows move it, into the dock too. OK puts it down.</string>
+    <string name="edit_home_hint_widget">Left and right move it. OK puts it down.</string>
+    <string name="tile_move">Move</string>
+    <string name="app_info">App info</string>
+    <string name="widget_cpu">CPU</string>
+
+    <!-- Air quality widget -->
+    <string name="air_quality">Air quality</string>
+    <string name="air_tomorrow">%s tomorrow</string>
+    <string name="air_detail">%1$s, PM2.5 %2$d</string>
+    <string name="air_detail_tomorrow">%s at its worst</string>
+    <string name="air_offline">Can\'t reach the air quality service</string>
+    <string name="aqi_good">Good</string>
+    <string name="aqi_moderate">Moderate</string>
+    <string name="aqi_sensitive">Unhealthy for some</string>
+    <string name="aqi_unhealthy">Unhealthy</string>
+    <string name="aqi_very_unhealthy">Very unhealthy</string>
+    <string name="aqi_hazardous">Hazardous</string>
+
+    <!-- Widget settings -->
+    <string name="widget_settings">Settings</string>
+    <string name="setting_location">Location</string>
+    <string name="setting_location_shared">Location (shared with Weather)</string>
+    <string name="setting_unit">Unit</string>
+    <string name="setting_countdown">Count down to</string>
+    <string name="countdown_next">Next holiday</string>
+    <string name="countdown_tet">Tết only</string>
+    <string name="setting_cpu">CPU line</string>
+    <string name="option_shown">Shown</string>
+    <string name="option_hidden">Hidden</string>
+    <string name="widget_city_auto">Automatic (from IP)</string>
+
+    <!-- Greeting name (Launcher settings) -->
+    <string name="settings_group_home">Home</string>
+    <string name="settings_group_you">You</string>
+    <string name="settings_group_motion">Motion</string>
+    <string name="settings_group_system">System</string>
+    <string name="settings_group_about">About</string>
+    <string name="about_version">Version</string>
+    <string name="about_default">Default launcher</string>
+    <string name="about_default_yes">This launcher</string>
+    <string name="about_default_no">Another app. Choose to change it.</string>
+    <string name="about_stock">Google TV home screen</string>
+    <string name="about_stock_off">Turned off</string>
+    <string name="about_stock_on">Turned on</string>
+    <string name="about_stock_none">Not on this TV</string>
+    <string name="your_name">Your name</string>
+    <string name="your_name_none">Not set</string>
+    <string name="save">Save</string>
+
+    <!-- Wi-Fi menu (hold OK on the Wi-Fi pill) -->
+    <string name="wifi_change">Change network</string>
+    <string name="signal_weak">Weak signal</string>
+
+    <!-- Wi-Fi pill and speed test -->
+    <string name="wifi_label_detail">%1$s (%2$s)</string>
+    <string name="wifi_no_internet">No internet</string>
+    <string name="speed_test">Test speed</string>
+    <string name="speed_starting">Starting</string>
+    <string name="speed_measuring">Measuring: %d Mbps</string>
+    <string name="speed_result">%1$d Mbps, %2$s, ping %3$d ms</string>
+    <string name="speed_failed">Couldn\'t test the speed</string>
+    <string name="speed_4k">good for 4K</string>
+    <string name="speed_hd">good for HD</string>
+    <string name="speed_sd">SD only</string>
+    <string name="speed_slow">too slow for video</string>
+
+    <!-- Running apps panel (the remote's Apps button; stops apps through adb on the TV itself) -->
+    <string name="running_apps">Running apps</string>
+    <string name="running_connecting">Connecting to the TV</string>
+    <string name="running_allow">If the TV asks to allow debugging, tick Always allow and choose Allow</string>
+    <string name="running_off">Network adb is off. Run adb tcpip 5555 from a computer, then try again.</string>
+    <string name="running_denied">The TV did not allow it. Try again and choose Allow.</string>
+    <string name="running_failed">Couldn\'t read the running apps</string>
+    <string name="running_none">Nothing is running in the background</string>
+    <plurals name="running_count">
+        <item quantity="one">%d app</item>
+        <item quantity="other">%d apps</item>
+    </plurals>
+    <string name="running_summary">%1$s, %2$s in use</string>
+    <string name="running_hint">OK switches to it, hold OK stops it</string>
+    <string name="running_on_screen">On screen, %s</string>
+    <string name="running_stop_all">Stop all</string>
+    <string name="try_again">Try again</string>
+    <string name="animations_desc">Off moves focus instantly, lightest on slow TVs</string>
+    <string name="widgets_desc">Weather, air quality, lunar date and system stats</string>
+    <string name="reboot">Boot options</string>
+    <string name="reboot_desc">Needs network debugging on</string>
+    <string name="reboot_action">Restart</string>
+    <string name="update_title">Launcher update</string>
+    <string name="update_checking">%1$s, checking for updates…</string>
+    <string name="update_current">%1$s is up to date</string>
+    <string name="update_available">Version %1$s is out (%2$d KB). Press OK to install</string>
+    <string name="update_downloading">Downloading %1$d%%</string>
+    <string name="update_installing">Installing. Press OK if nothing appears</string>
+    <string name="update_check_failed">Couldn\'t check. Press OK to try again</string>
+    <string name="update_download_failed">Download failed. Press OK to try again</string>
+    <string name="update_needs_permission">Installs are blocked. Run launcher/build-and-install.sh once</string>
+    <string name="update_install_failed">Update failed: %1$s</string>
+    <string name="power_off_action">Turn off</string>
+    <string name="boot_options_message">Choose what the TV does next</string>
+    <string name="restart_desc">Turns the TV off and on again</string>
+    <string name="power_off_desc">Standby, the remote\'s power button wakes it</string>
+    <string name="settings_group_look">Appearance</string>
+    <string name="look_color">Colour</string>
+    <string name="look_color_theme">Theme default</string>
+    <string-array name="look_seed_names">
+        <item>Violet</item>
+        <item>Blue</item>
+        <item>Teal</item>
+        <item>Green</item>
+        <item>Orange</item>
+        <item>Pink</item>
+        <item>Red</item>
+    </string-array>
+    <string name="look_backdrop">Background</string>
+    <string name="look_backdrop_shapes">Expressive shapes</string>
+    <string name="look_backdrop_sky">Sky that follows the time of day</string>
+    <string name="look_backdrop_plain">Plain</string>
+    <string name="look_backdrop_wallpaper">The theme\'s wallpaper</string>
+    <string name="settings_group_screensaver">Screensaver</string>
+    <string name="screensaver_after">Start after</string>
+    <string name="screensaver_never">Never</string>
+    <plurals name="screensaver_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <string name="screensaver_denied">Needs launcher/build-and-install.sh to change the TV\'s screensaver time</string>
+    <string name="screensaver_style">Clock style</string>
+    <string name="screensaver_style_shapes">Moving shapes</string>
+    <string name="screensaver_style_glow">Colour glow</string>
+    <string name="screensaver_style_minimal">Minimal, dim</string>
+    <string name="screensaver_style_large">Large clock</string>
+    <string name="menu_inputs">Menu button opens Inputs</string>
+    <string name="menu_inputs_desc">The three-line button lists HDMI and the other inputs, in any app</string>
+    <string name="about_author">Author</string>
+    <string name="about_email">Email</string>
+    <string name="about_source">Source</string>
+    <string name="about_author_name" translatable="false">Kien Mai Trung</string>
+    <string name="about_email_value" translatable="false">kien.mai.trung.98@gmail.com</string>
+    <string name="about_source_value" translatable="false">github.com/tienzodi/cleanyourtv</string>
+    <string name="setting_opens">Opens on</string>
+    <string name="page_now">Now</string>
+    <string name="page_details">Details</string>
+    <string name="page_tomorrow">Tomorrow</string>
+    <string name="page_today">Today</string>
+    <string name="sys_page_usage">In use</string>
+    <string name="sys_page_network">Network</string>
+    <string name="sys_page_device">Device</string>
+    <string name="sys_page_space">Free space</string>
+    <string name="sys_page_chip">Chip</string>
+    <string name="sys_wifi">Wi-Fi</string>
+    <string name="sys_ethernet">Ethernet</string>
+    <string name="sys_offline">Offline</string>
+    <string name="sys_connected">Connected</string>
+    <string name="sys_ip">IP</string>
+    <string name="sys_signal">Signal</string>
+    <string name="sys_link">Link</string>
+    <string name="sys_wired">Wired</string>
+    <string name="sys_model">Model</string>
+    <string name="sys_android">Android</string>
+    <string name="sys_uptime">Uptime</string>
+    <string name="sys_usb">USB</string>
+    <string name="sys_none">None</string>
+    <string name="sys_free">%s free</string>
+    <string name="sys_clock">Clock</string>
+    <string name="sys_thermal">Thermal</string>
+    <string name="thermal_normal">Normal</string>
+    <string name="thermal_warm">Warm</string>
+    <string name="thermal_hot">Hot</string>
+    <string name="thermal_unknown">Not reported</string>
+    <string name="uptime_days">%1$d d %2$d h</string>
+    <string name="uptime_hours">%1$d h %2$d min</string>
+    <string name="uptime_minutes">%d min</string>
 </resources>

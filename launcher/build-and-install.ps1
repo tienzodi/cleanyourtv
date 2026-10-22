@@ -57,7 +57,7 @@ if (-not $StockLauncher) {
 Write-Host "Stock launcher: $StockLauncher"
 $disableStock = if ($StockLauncher -eq 'none') { 'echo stock launcher left alone' } else { "pm disable-user --user 0 $StockLauncher" }
 
-$apk = 'app\build\outputs\apk\release\app-release.apk'
+$apk = 'app\build\outputs\apk\release\km-launcher.apk'
 & $py -I ..\tools\b64push.py $apk /data/local/tmp/tvhome.apk
 if ($LASTEXITCODE -ne 0) { throw 'APK upload failed' }
 $out = & $py -I ..\tools\tv.py 'pm install -r /data/local/tmp/tvhome.apk; rm -f /data/local/tmp/tvhome.apk'
@@ -74,6 +74,8 @@ Write-Host $start
 if ($start -notmatch 'Status: ok' -or $start -match '(?m)^Error') { throw "the new launcher did not start (see above); $StockLauncher was left enabled" }
 @(
     'pm grant com.gathin.tvhome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; echo location-granted',
+    'pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; echo secure-settings-granted',
+    'appops set com.gathin.tvhome REQUEST_INSTALL_PACKAGES allow 2>/dev/null; echo install-packages-allowed',
     'cmd package compile -m speed -f com.gathin.tvhome',
     $disableStock,
     'cmd package set-home-activity --user 0 com.gathin.tvhome/.MainActivity'

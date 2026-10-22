@@ -73,6 +73,7 @@ final class WallpaperPlayer {
             Bitmap bitmap = decode(first);
             if (bitmap != null) {
                 image.setImageBitmap(bitmap);
+                publishPalette(bitmap);
                 displayed = first.getName();
                 if (!displayed.equals(previous)) {
                     preferences.edit().putString("image", displayed)
@@ -83,6 +84,11 @@ final class WallpaperPlayer {
             files.remove(first);   // unreadable or over 4K: try another, or keep the plain colour
             first = WallpaperRotation.pick(files, previous, random);
         }
+    }
+
+    /** Whether a picture is on screen (a wallpaper is configured and one of its images decoded). */
+    boolean showing() {
+        return image.getDrawable() != null;
     }
 
     void start() {
@@ -100,6 +106,26 @@ final class WallpaperPlayer {
         decoder.shutdownNow();
     }
 
+    /** Dynamic colour from the first picture, worked out on the decoder thread. */
+    private void publishPalette(Bitmap bitmap) {
+        decoder.execute(() -> {
+            Palette palette = paletteOf(bitmap);
+            root.post(() -> {
+                if (!closed) Palette.publish(palette);
+            });
+        });
+    }
+
+    private static Palette paletteOf(Bitmap bitmap) {
+        if (bitmap == null) return null;
+        try {
+            return Palette.fromWallpaper(bitmap);
+        } catch (Exception | OutOfMemoryError failure) {
+            Log.w("TvHome.Wallpaper", "No dynamic colour: " + failure);
+            return null;
+        }
+    }
+
     void update() {
         if (!active || closed || loading || files.isEmpty()) return;
         String previous = preferences.getString("image", "");
@@ -113,6 +139,7 @@ final class WallpaperPlayer {
         loading = true;
         decoder.execute(() -> {
             Bitmap bitmap = decode(next);
+            Palette palette = paletteOf(bitmap);
             root.post(() -> {
                 loading = false;
                 if (closed || !active) {
@@ -126,6 +153,7 @@ final class WallpaperPlayer {
                     return;
                 }
                 image.setImageBitmap(bitmap);
+                Palette.publish(palette);
                 displayed = next.getName();
                 if (!displayed.equals(previous) || changed == 0) {
                     preferences.edit().putString("image", displayed)

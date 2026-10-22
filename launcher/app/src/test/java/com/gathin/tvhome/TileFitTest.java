@@ -38,9 +38,10 @@ public class TileFitTest {
     }
 
     @Test
-    public void oneRowUnderATitledDockFits() {
+    public void oneRowUnderATitledDockFitsAtFullSize() {
+        // With the 32dp row rhythm (no labels under tiles) the dock, its title and one row fit unshrunk.
         int w = AppAdapter.tileWidthPx(INNER, GRID_H, 4, 1, true, true, D);
-        assertTrue(w < AppAdapter.tileWidthPx(INNER, 4, D));
+        assertEquals(AppAdapter.tileWidthPx(INNER, 4, D), w);
         assertTrue(height(w, 1, true) <= GRID_H + 2);
     }
 
@@ -66,7 +67,8 @@ public class TileFitTest {
 
     @Test
     public void droppingTheTitleGivesBiggerTiles() {
-        assertTrue(AppAdapter.tileWidthPx(INNER, GRID_H, 4, 1, false, true, D)
-                > AppAdapter.tileWidthPx(INNER, GRID_H, 4, 1, true, true, D));
+        // Two rows, where the height limit still decides the size.
+        assertTrue(AppAdapter.tileWidthPx(INNER, GRID_H, 4, 2, false, true, D)
+                > AppAdapter.tileWidthPx(INNER, GRID_H, 4, 2, true, true, D));
     }
 }

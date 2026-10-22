@@ -26,6 +26,8 @@ powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -TvHost 192.168.1.50 th
 Every key is optional; a missing key keeps the value from `config.xml`, an unknown or wrongly typed key
 is ignored, and a file that doesn't parse is ignored as a whole, so a theme can never break Home.
 
+The launcher checks keys, types and ranges against [`launcher/contract.json`](../launcher/contract.json); that file is the authority when this table and the code disagree. The same contract caps `config.json` at 64 KB and each wallpaper at 10 MB.
+
 | Key | Type | Meaning |
 |---|---|---|
 | `dock_apps` | list of package names | The dock row, in order; missing apps are skipped |

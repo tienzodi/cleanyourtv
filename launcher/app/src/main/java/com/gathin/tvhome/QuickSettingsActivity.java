@@ -22,17 +22,20 @@ public final class QuickSettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        Palette.loadDarkMode(this);
         setContentView(R.layout.activity_quick_settings);
         findViewById(R.id.scrim).setOnClickListener(v -> finish());
         LinearLayout rows = findViewById(R.id.rows);
-        addRow(rows, R.drawable.ic_settings, R.string.tv_settings, 0, new Intent(Settings.ACTION_SETTINGS));
-        addRow(rows, R.drawable.ic_picture, R.string.quick_picture, 0, new Intent(Settings.ACTION_DISPLAY_SETTINGS));
+        addRow(rows, R.drawable.ic_settings, R.string.tv_settings, 0, TvSettings.main(this));
+        addRow(rows, R.drawable.ic_picture, R.string.quick_picture, 0, TvSettings.picture(this));
         addRow(rows, R.drawable.ic_wifi, R.string.quick_network, 0, new Intent(Settings.ACTION_WIFI_SETTINGS));
         addRow(rows, R.drawable.ic_apps, R.string.quick_apps, R.string.quick_apps_hint,
                 new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS));
         // Through Home, so it rebuilds with the new choices when Launcher settings closes.
         addRow(rows, R.drawable.ic_home_settings, R.string.launcher_settings, 0,
                 new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCHER_SETTINGS));
+        Config config = Config.load(this);
+        M3Skin.apply(findViewById(R.id.panel), Palette.currentOrBaseline(), config.animations, config.reducedMotion);
         rows.getChildAt(0).requestFocus();
     }
 

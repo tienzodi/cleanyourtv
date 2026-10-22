@@ -64,6 +64,8 @@ final class AppLibraryDialog {
     private RecyclerView catalog;
     private FrameLayout shelf;
     private GlassView highlight;
+    /** The launcher's dynamic colour scheme. */
+    private final Palette colors = Palette.currentOrBaseline();
     private SpringAnimation spring;
     private float scrollOffset;
     private boolean highlightShown;
@@ -98,7 +100,6 @@ final class AppLibraryDialog {
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(color);
         bg.setCornerRadius(dp(radius));
-        bg.setStroke(dp(1), 0x18FFFFFF);
         return bg;
     }
 
@@ -119,8 +120,10 @@ final class AppLibraryDialog {
         panel = new LinearLayout(activity);
         panel.setLayoutDirection(rtl ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
         panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setPadding(dp(12), dp(8), dp(12), dp(12));
-        panel.setBackgroundResource(R.drawable.glass_panel);
+        // M3 dialog surface. Concentric: 16dp app cards + 12dp padding = 28dp (extra-large) panel corners.
+        panel.setPadding(dp(12), dp(12), dp(12), dp(12));
+        panel.setBackground(surface(colors.surfaceContainerHigh, (int) Shapes.EXTRA_LARGE));
+        panel.setElevation(dp(6));
         View decor = activity.getWindow().getDecorView();
         catalogWidth = Math.min(dp(800), Math.max(dp(200), decor.getWidth() - dp(64)));
         int width = catalogWidth;
@@ -203,7 +206,7 @@ final class AppLibraryDialog {
     }
 
     private void heading(String text) {
-        TextView title = text(text, 18, 0xFFFFFFFF);
+        TextView title = text(text, 18, colors.onSurface);
         title.setMaxLines(1);
         title.setEllipsize(TextUtils.TruncateAt.END);
         title.setPadding(dp(12), dp(10), dp(12), dp(8));
@@ -217,17 +220,18 @@ final class AppLibraryDialog {
         LinearLayout header = new LinearLayout(activity);
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(dp(12), dp(4), dp(8), dp(4));
-        TextView title = text(activity.getString(R.string.app_library), 22, Color.WHITE);
+        TextView title = text(activity.getString(R.string.app_library), 24, colors.onSurface);
+        title.setTypeface(activity.getResources().getFont(R.font.sans_headline));
         header.addView(title, new LinearLayout.LayoutParams(0, dp(36), 1));
         title.setGravity(Gravity.CENTER_VERTICAL);
         title.setSingleLine(true);
         title.setEllipsize(TextUtils.TruncateAt.END);
         TextView count = text(activity.getResources().getQuantityString(
-                R.plurals.library_app_count, totalApps, totalApps), 13, 0xA6FFFFFF);
+                R.plurals.library_app_count, totalApps, totalApps), 13, colors.onSurfaceVariant);
         count.setSingleLine(true);
         header.addView(count, new LinearLayout.LayoutParams(-2, -2));
         panel.addView(header, new LinearLayout.LayoutParams(-1, dp(44)));
-        instructions = text(activity.getString(R.string.library_hint_add), 13, 0xBBFFFFFF);
+        instructions = text(activity.getString(R.string.library_hint_add), 13, colors.onSurfaceVariant);
         instructions.setSingleLine(true);
         instructions.setEllipsize(TextUtils.TruncateAt.END);
         instructions.setPadding(dp(12), 0, dp(12), dp(6));
@@ -267,8 +271,9 @@ final class AppLibraryDialog {
             @Override public float getValue(View view) { return view.getTranslationX() + scrollOffset; }
             @Override public void setValue(View view, float value) { view.setTranslationX(value - scrollOffset); }
         });
-        spring.setSpring(new SpringForce().setStiffness(reducedMotion ? 1400f : 260f)
-                .setDampingRatio(reducedMotion ? 0.95f : 0.58f));
+        Motion.DEFAULT_SPATIAL.reduced(reducedMotion).apply(spring);
+        highlight.setRingColor(colors.primary);
+        highlight.setRadius(dp((int) Shapes.LARGE));
         list.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
                 scrollOffset += dx;
@@ -399,8 +404,8 @@ final class AppLibraryDialog {
         menuPanel.setScaleY(0.92f);
         menuPanel.setTranslationY(-dp(8));
         menu.showAtLocation(activity.getWindow().getDecorView(), Gravity.TOP | Gravity.START, x, y);
-        menuPanel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
-                .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
+        M3Skin.apply(menuPanel, colors, animations, reducedMotion);
+        Motion.DEFAULT_SPATIAL.reduced(reducedMotion).drive(menuPanel.animate().alpha(1f).scaleY(1f).translationY(0f)).start();
         rows.getChildAt(0).requestFocus();
     }
 
@@ -426,7 +431,7 @@ final class AppLibraryDialog {
         view.setText(value);
         view.setTextSize(size);
         view.setTextColor(color);
-        view.setTypeface(activity.getResources().getFont(R.font.outfit_medium));
+        view.setTypeface(activity.getResources().getFont(R.font.sans_medium));
         view.setLetterSpacing(0.01f);
         view.setIncludeFontPadding(false);
         return view;
@@ -451,14 +456,14 @@ final class AppLibraryDialog {
             icon.setId(R.id.icon);
             icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
             content.addView(icon, new LinearLayout.LayoutParams(dp(60), dp(60)));
-            TextView name = text("", 15, Color.WHITE);
+            TextView name = text("", 15, colors.onSurface);
             name.setId(R.id.title);
             name.setGravity(Gravity.CENTER);
             name.setMaxLines(2);
             LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(-1, dp(44));
             nameParams.topMargin = dp(10);
             content.addView(name, nameParams);
-            TextView status = text("", 11, 0xBBFFFFFF);
+            TextView status = text("", 11, colors.onSurfaceVariant);
             status.setId(R.id.status);
             status.setGravity(Gravity.CENTER);
             status.setMaxLines(2);
@@ -484,12 +489,17 @@ final class AppLibraryDialog {
             boolean recent = LibraryApps.recent(installTimes.getOrDefault(pkg, 0L), catalogTime);
             status.setText(home ? R.string.library_on_home : recent ? R.string.library_recent : R.string.library_add_home);
             status.setVisibility(View.VISIBLE);
-            holder.itemView.setBackground(surface(home ? 0x1475BBA4 : 0x0CFFFFFF, 18));
+            holder.itemView.setBackground(surface(home ? colors.secondaryContainer : colors.surfaceContainerHighest,
+                    (int) Shapes.LARGE));
             View check = holder.itemView.findViewById(R.id.dot);
             check.getLayoutParams().width = dp(home ? 18 : 8);
             check.getLayoutParams().height = dp(home ? 18 : 8);
-            if (home) check.setBackgroundResource(R.drawable.library_check);
-            else check.setBackground(surface(0xFF70D9A0, 8));
+            if (home) {
+                check.setBackgroundResource(R.drawable.library_check);
+                check.setBackgroundTintList(android.content.res.ColorStateList.valueOf(colors.primary));
+            } else {
+                check.setBackground(surface(colors.tertiary, 8));
+            }
             check.setVisibility(home || recent ? View.VISIBLE : View.GONE);
             holder.itemView.setOnClickListener(v -> {
                 if (onHome.test(pkg)) open(app);

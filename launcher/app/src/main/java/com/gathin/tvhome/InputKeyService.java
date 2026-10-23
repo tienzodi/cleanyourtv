@@ -34,8 +34,9 @@ public class InputKeyService extends AccessibilityService {
     private int[] runningAppsKeycodes = new int[0];
     /** The app in front, from window changes; system overlays (the volume bar) leave it as it was. */
     private CharSequence frontPackage = "";
-    /** System overlays (the volume bar) come to the front without being a change of app. */
-    static final String[] SYSTEM_OVERLAYS = {"com.android.systemui", "com.xiaomi.mitv.systemui"};
+    /** System overlays (the volume bar, Sony's Action Menu) come to the front without being a change of app. */
+    static final String[] SYSTEM_OVERLAYS = {"com.android.systemui", "com.xiaomi.mitv.systemui",
+            "com.sony.dtv.sonysystemservice", "com.sony.dtv.scrums.action"};
 
     /** Standby is a break for the YouTube clock. */
     private final BroadcastReceiver screenOff = new BroadcastReceiver() {

@@ -304,4 +304,9 @@
     <string name="uptime_days">%1$d d %2$d h</string>
     <string name="uptime_hours">%1$d h %2$d min</string>
     <string name="uptime_minutes">%d min</string>
+    <!-- YouTube time warning (WatchTimeWarning) -->
+    <string name="youtube_warning">YouTube time warning</string>
+    <string name="youtube_warning_desc">After 30 minutes of YouTube in a row, a note says the TV is about to explode</string>
+    <string name="youtube_warning_title">The TV is about to explode!</string>
+    <string name="youtube_warning_body">Thirty minutes of YouTube in a row. Give your eyes a break.</string>
 </resources>

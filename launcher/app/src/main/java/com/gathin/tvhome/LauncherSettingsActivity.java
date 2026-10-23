@@ -54,6 +54,8 @@ public final class LauncherSettingsActivity extends Activity {
     private M3Switch animationsSwitch;
     private M3Switch advancedSwitch;
     private M3Switch widgetsSwitch;
+    private TextView youtubeWarningChoice;
+    private M3Switch youtubeWarningSwitch;
     private TextView nameChoice;
     private TextView widgetsChoice;
     private TextView tvSettingsChoice;
@@ -138,6 +140,18 @@ public final class LauncherSettingsActivity extends Activity {
             boolean on = !choices.getBoolean(WidgetShelf.PREF_KEY, widgetsDefault);
             choices.edit().putBoolean(WidgetShelf.PREF_KEY, on).apply();
             widgetsSwitch.setChecked(on);
+        });
+        youtubeWarningChoice = findViewById(R.id.youtubeWarningChoice);
+        youtubeWarningChoice.setText(item(getString(R.string.youtube_warning), getString(R.string.youtube_warning_desc)));
+        boolean warningDefault = getResources().getBoolean(R.bool.youtube_warning);
+        youtubeWarningSwitch = new M3Switch(density, palette, config.animations);
+        youtubeWarningSwitch.setChecked(choices.getBoolean(WatchTimeWarning.PREF_KEY, warningDefault));
+        youtubeWarningChoice.setCompoundDrawablesRelativeWithIntrinsicBounds(icon(R.drawable.ic_timer), null, youtubeWarningSwitch, null);
+        youtubeWarningChoice.setOnClickListener(v -> {
+            // The watcher reads it when the half hour is up, so this takes effect at once.
+            boolean on = !choices.getBoolean(WatchTimeWarning.PREF_KEY, warningDefault);
+            choices.edit().putBoolean(WatchTimeWarning.PREF_KEY, on).apply();
+            youtubeWarningSwitch.setChecked(on);
         });
         tvSettingsChoice.setOnClickListener(v -> open(TvSettings.main(this)));
         showMenuInputs(config, density);

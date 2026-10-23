@@ -159,4 +159,7 @@
     <!-- The weather widget's city, e.g. "Hanoi". Empty: wherever the TV's IP address is (approximate;
          two services can disagree by a whole city, so set this when it matters). -->
     <string name="weather_city" translatable="false"></string>
+    <!-- After 30 minutes of YouTube in front without a break, a card over it says the TV is about to
+         explode (WatchTimeWarning). On by default; Launcher settings turns it off. -->
+    <bool name="youtube_warning">true</bool>
 </resources>

@@ -69,6 +69,7 @@
                 <LinearLayout style="@style/SettingsSheetGroup">
                     <TextView android:id="@+id/columnsChoice" style="@style/SettingsListItem" />
                     <TextView android:id="@+id/widgetsChoice" style="@style/SettingsListItem" />
+                    <TextView android:id="@+id/youtubeWarningChoice" style="@style/SettingsListItem" />
                     <TextView android:id="@+id/menuInputsChoice" style="@style/SettingsListItem" />
                 </LinearLayout>
 

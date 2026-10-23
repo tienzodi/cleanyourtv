@@ -96,6 +96,13 @@ public class InputKeyService extends AccessibilityService {
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || app == null) return;
         for (String overlay : OVERLAYS) if (overlay.contentEquals(app)) return;
         frontPackage = app;
+        WatchTimeWarning.get().onWindow(this, app);
+    }
+
+    @Override
+    public void onDestroy() {
+        WatchTimeWarning.get().detach(this);
+        super.onDestroy();
     }
 
     @Override

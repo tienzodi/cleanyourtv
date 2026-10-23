@@ -156,6 +156,7 @@ public class HomeKeyService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || event.getPackageName() == null) return;
+        WatchTimeWarning.get().onWindow(this, event.getPackageName());
         if (isOtherHomeWindow(event)) {
             settle.removeCallbacks(replaceOtherHome);
             settle.postDelayed(replaceOtherHome, SETTLE_MS);
@@ -167,5 +168,12 @@ public class HomeKeyService extends AccessibilityService {
     @Override
     public void onInterrupt() {
         settle.removeCallbacks(replaceOtherHome);
+    }
+
+    @Override
+    public void onDestroy() {
+        WatchTimeWarning.get().detach(this);
+        settle.removeCallbacks(replaceOtherHome);
+        super.onDestroy();
     }
 }

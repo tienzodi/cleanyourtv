@@ -278,4 +278,9 @@
     <string name="uptime_days">%1$d ngày %2$d giờ</string>
     <string name="uptime_hours">%1$d giờ %2$d phút</string>
     <string name="uptime_minutes">%d phút</string>
+    <!-- YouTube time warning (WatchTimeWarning) -->
+    <string name="youtube_warning">Cảnh báo xem YouTube lâu</string>
+    <string name="youtube_warning_desc">Xem YouTube liên tục 30 phút sẽ hiện lời nhắc “TV sắp nổ rồi”</string>
+    <string name="youtube_warning_title">TV sắp nổ rồi!</string>
+    <string name="youtube_warning_body">Bạn đã xem YouTube 30 phút liền. Nghỉ mắt một chút nhé.</string>
 </resources>

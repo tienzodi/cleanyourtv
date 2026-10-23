@@ -1,5 +1,8 @@
 package com.gathin.tvhome;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.accessibilityservice.AccessibilityService;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -31,7 +34,17 @@ public class InputKeyService extends AccessibilityService {
     private int[] runningAppsKeycodes = new int[0];
     /** The app in front, from window changes; system overlays (the volume bar) leave it as it was. */
     private CharSequence frontPackage = "";
-    private static final String[] OVERLAYS = {"com.android.systemui", "com.xiaomi.mitv.systemui"};
+    /** System overlays (the volume bar) come to the front without being a change of app. */
+    static final String[] SYSTEM_OVERLAYS = {"com.android.systemui", "com.xiaomi.mitv.systemui"};
+
+    /** Standby is a break for the YouTube clock. */
+    private final BroadcastReceiver screenOff = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            WatchTimeWarning.get().onScreenOff();
+        }
+    };
+
 
     @Override
     protected void onServiceConnected() {
@@ -41,6 +54,7 @@ public class InputKeyService extends AccessibilityService {
         inputKeycodes = config.inputKeycodes;
         appKeys = RemoteKeys.parseAppKeys(config.appKeys);
         runningAppsKeycodes = getResources().getIntArray(R.array.running_apps_keycodes);
+        registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
     }
 
     private boolean isRunningAppsKey(int keyCode) {
@@ -94,13 +108,18 @@ public class InputKeyService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         CharSequence app = event.getPackageName();
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || app == null) return;
-        for (String overlay : OVERLAYS) if (overlay.contentEquals(app)) return;
+        for (String overlay : SYSTEM_OVERLAYS) if (overlay.contentEquals(app)) return;
         frontPackage = app;
         WatchTimeWarning.get().onWindow(this, app);
     }
 
     @Override
     public void onDestroy() {
+        try {
+            unregisterReceiver(screenOff);
+        } catch (IllegalArgumentException ignored) {
+            // never connected, so never registered
+        }
         WatchTimeWarning.get().detach(this);
         super.onDestroy();
     }

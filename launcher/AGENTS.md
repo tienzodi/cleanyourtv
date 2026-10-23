@@ -13,8 +13,8 @@ Locales: English and Vietnamese only.
 | `.MainActivity` | Home: header, widget shelf, dock, grid, Inputs/network/settings pills |
 | `.LauncherSettingsActivity`, `.QuickSettingsActivity`, `.HomeSettingsActivity` | On-TV settings (side sheet), gear-key panel, default-home picker |
 | `.RunningAppsActivity` | Running apps side sheet: switch to or force-stop apps, through `LocalAdb` |
-| `.InputKeyService` | Accessibility: Input button (`KEYCODE_TV`, `KEYCODE_TV_INPUT`, `input_key_keycodes`, Menu if `menu_opens_inputs`), `app_keys`, `running_apps_keycodes`; no system switcher: Home's Inputs menu |
-| `.HomeKeyService` | Accessibility: Home that sends `KEYCODE_ALL_APPS`, `settings_key_*`, `app_keys`; stands in for Home where the firmware keeps it (Xiaomi CN): `KEYCODE_HOME` and any other HOME activity coming to the front (the stock launcher, or Settings' FallbackHome once the stock one is disabled) open this one, 300 ms after it settles |
+| `.InputKeyService` | Accessibility: Input button (`KEYCODE_TV`, `KEYCODE_TV_INPUT`, `input_key_keycodes`, Menu if `menu_opens_inputs`), `app_keys`, `running_apps_keycodes`; no system switcher: Home's Inputs menu. Feeds `WatchTimeWarning` its window events |
+| `.HomeKeyService` | Accessibility: Home that sends `KEYCODE_ALL_APPS`, `settings_key_*`, `app_keys`; stands in for Home where the firmware keeps it (Xiaomi CN): `KEYCODE_HOME` and any other HOME activity coming to the front (the stock launcher, or Settings' FallbackHome once the stock one is disabled) open this one, 300 ms after it settles. Feeds `WatchTimeWarning` its window events |
 | `.ClockDream` | Clock screensaver; style from Launcher settings (shapes, glow, minimal, large) |
 | `.InstallStatusReceiver` | Not exported: the PackageInstaller session's result; shows the system confirm dialog |
 
@@ -34,6 +34,9 @@ Locales: English and Vietnamese only.
 - Inputs on Xiaomi's China TVs: `XiaomiInputs` (their player's source numbers, from the port labels).
 - Config: `Config` reads `res/values/config.xml`, overlaid by `/sdcard/Android/data/com.gathin.tvhome/files/config.json` (a theme).
 - Module cards: `Cards`, `CardFeature`. Remote keys: `RemoteKeys`. VPN pill badge: `VpnBadge`.
+- YouTube time warning: `WatchTimeWarning`, one per process, fed by both key services. One delayed post 30 min
+  after YouTube comes to the front (the only timer in the services); any other app's window, or the
+  screen going off, cancels it. The card is a `TYPE_ACCESSIBILITY_OVERLAY` window shown for 12 s.
 - Updates: `LauncherRelease` (GitHub `releases/latest` of tienzodi/cleanyourtv, checked once when
   Launcher settings opens), `ReleaseInstaller` (streams `km-launcher.apk` into a PackageInstaller
   session, checks the asset's SHA-256), `InstallStatusReceiver`. Needs the `REQUEST_INSTALL_PACKAGES`
@@ -54,6 +57,7 @@ Unknown or mistyped theme keys are ignored; a theme that does not parse is ignor
 | `live_tv_package`, `live_tv_action`, `source_panel_service`, `source_panel_action`, `input_action` | Live TV and input switching on odd firmware |
 | `input_key_keycodes`, `app_keys` (`"190:pkg"`), `settings_key_keycodes`, `settings_key_scancodes`, `settings_key_panel` | Remote buttons for the key services |
 | `running_apps_keycodes` (`config.xml` only, not in the contract) | Buttons that open the running apps panel; 284 `KEYCODE_ALL_APPS`, 187 `KEYCODE_APP_SWITCH` |
+| `youtube_warning`, `widget_order` (`config.xml` only, not in the contract) | Default for the YouTube time warning switch in Launcher settings; the widgets shown until the owner edits the shelf |
 | `animations`, `advanced_effects`, `reduced_motion` | Motion level; reduced for weak GPUs (MediaTek MT5895) |
 | `background_color`, `wallpaper`, `wallpaper_rotation_minutes` (0-1440), `wallpaper_dim` (0-90), `sky_intensity` (0-100) | Backdrop; seeds the colour scheme |
 | `widgets`, `weather_city`, `show_stats` | Widget shelf; empty city means locate by IP |

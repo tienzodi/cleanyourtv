@@ -8,6 +8,7 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
+import java.lang.ref.WeakReference;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,18 +27,16 @@ final class WatchTimeWarning {
     static final String WATCHED_PACKAGE = "com.google.android.youtube.tv";
     static final long WATCH_MS = 30 * 60 * 1000L;
     private static final long SHOW_MS = 12_000L;
-    /** System overlays (the volume bar) come to the front without being a change of app. */
-    private static final String[] OVERLAYS = {"com.android.systemui", "com.xiaomi.mitv.systemui"};
-
     private static WatchTimeWarning instance;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable warn = this::show;
     private final Runnable dismiss = this::hide;
-    /** The service that last reported a window; it owns the card's window. */
-    private AccessibilityService service;
+    /** The service that last reported a window; it owns the card's window. Weak: the singleton outlives services. */
+    private WeakReference<AccessibilityService> service = new WeakReference<>(null);
     private boolean watching;
-    private View card;
+    /** The card while it is on screen; weak, since the window manager holds it until it is removed. */
+    private WeakReference<View> card = new WeakReference<>(null);
 
     private WatchTimeWarning() {
     }
@@ -49,8 +48,8 @@ final class WatchTimeWarning {
 
     /** A window of {@code pkg} came to the front, reported by {@code from}. */
     void onWindow(AccessibilityService from, CharSequence pkg) {
-        for (String overlay : OVERLAYS) if (overlay.contentEquals(pkg)) return;
-        service = from;
+        for (String overlay : InputKeyService.SYSTEM_OVERLAYS) if (overlay.contentEquals(pkg)) return;
+        service = new WeakReference<>(from);
         if (WATCHED_PACKAGE.contentEquals(pkg)) {
             if (!watching) {
                 watching = true;
@@ -63,9 +62,14 @@ final class WatchTimeWarning {
 
     /** {@code from} is going away: drop the clock and the card if they were its. */
     void detach(AccessibilityService from) {
-        if (service != from) return;
+        if (service.get() != from) return;
         stop();
-        service = null;
+        service.clear();
+    }
+
+    /** The screen went off: standby is a break, however long YouTube stays in front behind it. */
+    void onScreenOff() {
+        stop();
     }
 
     private void stop() {
@@ -75,12 +79,13 @@ final class WatchTimeWarning {
     }
 
     private void show() {
+        AccessibilityService service = this.service.get();
         if (!watching || service == null) return;
         // Re-arm whether or not the card shows: a long session gets a nudge every WATCH_MS.
         handler.postDelayed(warn, WATCH_MS);
         SharedPreferences prefs = service.getSharedPreferences(Config.SETTINGS_NAME, Context.MODE_PRIVATE);
         if (!prefs.getBoolean(PREF_KEY, service.getResources().getBoolean(R.bool.youtube_warning))) return;
-        if (card != null) return;
+        if (card.get() != null) return;
         WindowManager wm = service.getSystemService(WindowManager.class);
         if (wm == null) return;
 
@@ -122,15 +127,16 @@ final class WatchTimeWarning {
         } catch (RuntimeException e) {
             return;   // the service lost its window token; nothing to show this time
         }
-        card = panel;
+        card = new WeakReference<>(panel);
         handler.postDelayed(dismiss, SHOW_MS);
     }
 
     private void hide() {
         handler.removeCallbacks(dismiss);
-        if (card == null) return;
-        View shown = card;
-        card = null;
+        View shown = card.get();
+        card.clear();
+        if (shown == null) return;
+        AccessibilityService service = this.service.get();
         if (service == null) return;
         WindowManager wm = service.getSystemService(WindowManager.class);
         if (wm == null) return;

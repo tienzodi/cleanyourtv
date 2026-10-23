@@ -1,5 +1,8 @@
 package com.gathin.tvhome;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.accessibilityservice.AccessibilityService;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -45,6 +48,15 @@ public class HomeKeyService extends AccessibilityService {
     private static final String STANDS_IN_FOR_HOME = "stands_in_for_home";
     private static final long SETTLE_MS = 300;
     private final Handler settle = new Handler(Looper.getMainLooper());
+
+    /** Standby is a break for the YouTube clock. */
+    private final BroadcastReceiver screenOff = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            WatchTimeWarning.get().onScreenOff();
+        }
+    };
+
     private final Runnable replaceOtherHome = () -> {
         rememberStandingIn();
         openHome();
@@ -53,6 +65,7 @@ public class HomeKeyService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
         // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
         Config config = Config.load(this);
@@ -172,6 +185,11 @@ public class HomeKeyService extends AccessibilityService {
 
     @Override
     public void onDestroy() {
+        try {
+            unregisterReceiver(screenOff);
+        } catch (IllegalArgumentException ignored) {
+            // never connected, so never registered
+        }
         WatchTimeWarning.get().detach(this);
         settle.removeCallbacks(replaceOtherHome);
         super.onDestroy();

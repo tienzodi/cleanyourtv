@@ -277,7 +277,7 @@ tools/theme.sh themes/aurora                                 # push a theme; --r
 | [`tools/recovery.py`](tools/recovery.py) | Writes the record `disable.sh` needs to undo itself, and prints the restore batch. |
 | [`tools/theme.sh`](tools/theme.sh) | Push a folder from [`themes/`](themes/) to the launcher and restart Home. |
 | [`tools/race_calendar.py`](tools/race_calendar.py) | Writes this season's F1 calendar into a theme for race-weekend mode, from the free Jolpica API. |
-| [`launcher/build-and-install.sh`](launcher/build-and-install.sh) | Builds a shrunk release (about 405 KB), installs it, switches Home, and rolls back if Home does not land on it. |
+| [`launcher/build-and-install.sh`](launcher/build-and-install.sh) | Builds a shrunk release (about 540 KB), installs it, grants location, secure settings and the install appop, switches Home, and rolls back if Home does not land on it. |
 
 Debloat list paths passed to `disable.sh` and `restore.sh` are relative to the directory you run
 from, so your own lists can live outside the repository. Absolute paths also work.
@@ -303,20 +303,29 @@ the new launcher Home and the entry is applied; `FORCE_HOME=1` (`$env:FORCE_HOME
 
 ## The launcher
 
-A small native Android TV app (`com.gathin.tvhome`, about 405 KB installed) in plain Java with
-AndroidX RecyclerView and nothing heavier. Built for sets with 1 GB of RAM: no blur, no video, no
-network, no background services. It needs JDK 17 and Android SDK platform 34 to build; on macOS,
+A small native Android TV app (`com.gathin.tvhome`, about 540 KB installed) in plain Java with
+AndroidX RecyclerView, DynamicAnimation and Google's material colour utilities. Built for sets with
+1 GB of RAM: no blur, no video, no polling, no background services. The home screen is the
+km-launcher from [kienmai160598/freeTV](https://github.com/kienmai160598/freeTV) (MIT, itself a fork
+of this project): a header with the clock and greeting, a widget shelf, a dock and the app grid, in
+Material 3 colour seeded from the wallpaper or `background_color`.
+
+Network: the weather and air quality widgets ask Open-Meteo, and find the place from the TV's IP
+(ipwho.is or geojs.io); the network pill's speed test calls Cloudflare only when you start it;
+Launcher settings checks this repo's GitHub releases once when opened. Nothing else leaves the TV.
+Turn the widgets off in Launcher settings if you want none of it. It needs JDK 17 and Android SDK platform 34 to build; on macOS,
 `brew install openjdk@17 android-commandlinetools` and `sdkmanager "platforms;android-34" "build-tools;34.0.0"`. On Linux
 the install script finds `~/Android/Sdk` and the `java` on your PATH.
 
-- **Configure** in [`config.xml`](launcher/app/src/main/res/values/config.xml): dock order, hidden apps, the Live TV package, columns (tiles shrink from 5 up), rows under the dock, an optional VPN app for the network pill, and `reduced_motion` for TVs whose GPU cannot keep up.
+- **Configure** in [`config.xml`](launcher/app/src/main/res/values/config.xml): dock order, hidden apps, the Live TV package, columns (tiles shrink from 5 up), rows under the dock, an optional VPN app for the network pill, `widgets` and `weather_city`, and `reduced_motion` for TVs whose GPU cannot keep up. Keys, types and ranges are defined in [`launcher/contract.json`](launcher/contract.json).
+- **Widgets** above the dock: weather and air quality for your city (or the place found from the TV's IP), CPU, memory and storage, and the lunar calendar with the next holiday. Edit Home (hold OK on Settings) adds or removes them.
+- **YouTube time warning:** after 30 minutes of YouTube in a row, a card over the video says the TV is about to explode and goes away after 12 seconds ([picture](docs/youtube-warning.jpg)). Switching apps or standby resets the clock. Needs the Input or Home key service; off in Launcher settings, default from `youtube_warning` in `config.xml`.
+- **Running apps** (`running_apps_keycodes`, or from Launcher settings): switch to or force-stop apps, through a local ADB connection the TV asks you to allow once; port 5555 is gone after a reboot until `adb tcpip 5555` runs again.
 - **App library (optional):** enable `app_library` in config.xml or a theme to browse installed apps and add or remove Home shortcuts with the remote. See [the app library guide](docs/app-library.md).
 - **On-TV launcher settings:** click Settings for the TV's system settings, or hold OK on Settings and choose Launcher settings to set 4, 5, 6 or 7 apps per row, turn animations on or off, and opt into advanced effects. The advanced option adds tile lift, icon zoom and smooth ambient-colour transitions; it may use more memory. Use Follow theme to clear on-TV choices. Pushing or resetting a theme also clears them.
 - **Change the default home:** Launcher settings and the optional Default-home tile (`show_home_settings_shortcut`) open Android's home picker. Choose the original launcher to stop using CleanYourTV as Home, or CleanYourTV to return. The original launcher must be enabled. If the install script disabled it, use the restore script below first. Some TVs provide no home picker.
 - **Themes** set the same keys plus a background colour and a wallpaper from a `config.json` pushed to the TV, no rebuild. Six ship in [`themes/`](themes/), documented there.
-- **Language** follows the TV: English, German, Spanish, Catalan, French, Russian, Serbian (Latin), Polish, Czech, Italian, Portuguese, Turkish, Arabic, Hebrew, Simplified Chinese, Traditional Chinese (Taiwan), Thai, Finnish, Vietnamese, Bangla, Indonesian. Android 13+ can set it for the launcher alone: `tools/tv.py 'cmd locale set-app-locales com.gathin.tvhome --locales ca'`.
-  Hebrew places the menu buttons on the left and the date and clock on the right, with the greeting above the clock. The Clock screensaver right-aligns its date and time, and Hebrew dates include the month prefix ב (for example, 19 באוקטובר). Hebrew dock and app-grid rows start on the right, with matching left/right remote navigation. The Hebrew input selector places icons and labels on the right, status on the left, and aligns the dropdown with the Inputs button’s right edge. Other languages keep their original layouts.
-  Russian includes the module-card approval and management screens and the VPN-off badge.
+- **Language** follows the TV: English and Vietnamese. The earlier 21-language launcher is in this repo's history before the km-launcher port; translations for the new strings are welcome in `values-*` folders (and `resourceConfigurations` in `app/build.gradle`). Android 13+ can set it for the launcher alone: `tools/tv.py 'cmd locale set-app-locales com.gathin.tvhome --locales vi'`.
 - **Module cards** let any TV app declare its own tile (label, caption, glow). The launcher asks you once per app, Keep hidden by default, and remembers the answer for that app's signing key and card name. Hold OK on Settings and choose Module cards to change your mind. How to make one: [`docs/modules.md`](docs/modules.md); the contract: [`docs/specs/card.md`](docs/specs/card.md).
 - **Clock screensaver**: a drifting clock over the glow, so nothing burns in. Pick "Clock" in the TV's screensaver settings, or over ADB:
   `tools/tv.py 'settings put secure screensaver_components com.gathin.tvhome/.ClockDream; settings put secure screensaver_enabled 1'`

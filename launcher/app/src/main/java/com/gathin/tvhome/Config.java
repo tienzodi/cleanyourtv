@@ -16,9 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The launcher's settings: the values in res/values/config.xml, with an optional overlay read from
@@ -31,12 +29,10 @@ import java.util.Map;
  */
 final class Config {
     private static final String TAG = "TvHome.Config";
-    static final String FILE_NAME = "config.json";
-    static final String WALLPAPER_NAME = "wallpaper.jpg";
+    static final String FILE_NAME = Contract.Theme.CONFIG_FILE;
+    static final String WALLPAPER_NAME = Contract.Theme.WALLPAPER_FILE;
     static final String SETTINGS_NAME = "launcher_settings";
-    static final String ROWS_BELOW_DOCK_KEY = "rows_below_dock";
-    static final String WALLPAPER_CHOICE_KEY = "wallpaper_choice";
-    private static final String THEME_REVISION_NAME = "theme_revision";
+    private static final String THEME_REVISION_NAME = Contract.Theme.REVISION_FILE;
     private static final String THEME_SIGNATURE_KEY = "theme_signature";
 
     final List<String> dockApps;
@@ -45,12 +41,6 @@ final class Config {
     final List<String> hiddenApps;
     final String liveTvPackage;
     final String liveTvAction;
-    /** Package to the action its tile sends instead of opening the start screen (config.xml, launch_actions). */
-    final Map<String, String> launchActions;
-    /** Package to the name its tile shows instead of the app's label (config.xml, app_labels). */
-    final Map<String, String> appLabels;
-    /** Package to a bundled banner_* drawable its tile shows instead of the app's art (config.xml, app_banners). */
-    final Map<String, String> appBanners;
     final String sourcePanelService;
     final String sourcePanelAction;
     final String inputAction;
@@ -76,7 +66,7 @@ final class Config {
     final boolean showStats;
     /** App library pill after the last Home row (config.xml app_library). */
     final boolean appLibrary;
-    /** Background colour behind everything, #RRGGBB; black unless a theme says otherwise. */
+    /** Background colour behind everything, #RRGGBB; black unless a theme or Launcher settings says otherwise. */
     final int backgroundColor;
     /** Time-of-day backdrop, 0 to 100 (config.xml, sky_intensity); 0 keeps the plain background. */
     final int skyIntensity;
@@ -100,21 +90,15 @@ final class Config {
     final boolean overlayApplied;
     /** Festive skin from a theme (festival, festival_until, greeting, accent_color); {@link Festival#NONE} if none. */
     final Festival festival;
-    /** F1 weekends from a theme's race_calendar (see RaceWeekend); empty when the theme has none. */
-    final List<RaceWeekend.Race> raceCalendar;
-    /** Cinematic top shelf (config.xml, cinematic_home): the focused dock app's artwork behind a larger shelf. */
-    final boolean cinematicHome;
 
     private Config(List<String> dockApps, boolean fillDock, List<String> hiddenApps, String liveTvPackage,
-                   String liveTvAction, Map<String, String> launchActions, Map<String, String> appLabels,
-                   Map<String, String> appBanners, String sourcePanelService, String sourcePanelAction, String inputAction,
+                   String liveTvAction, String sourcePanelService, String sourcePanelAction, String inputAction,
                    int columns, int rowsBelowDock, boolean animations, boolean advancedEffects,
                    boolean shamsiDate, String greetingName, boolean moduleCards, boolean reducedMotion, boolean dockTitle, boolean dockRow, boolean reorderButton, String vpnApp,
                    boolean showHomeSettingsShortcut, boolean showStats, boolean appLibrary, int backgroundColor, int skyIntensity,
                    int[] settingsKeycodes, boolean settingsKeyPanel, boolean wallpaperEnabled, File wallpaper, List<File> wallpapers,
                    int wallpaperRotationMinutes, int wallpaperDim, boolean overlayApplied,
-                   Festival festival, int[] inputKeycodes, List<String> appKeys,
-                   List<RaceWeekend.Race> raceCalendar, boolean cinematicHome) {
+                   Festival festival, int[] inputKeycodes, List<String> appKeys) {
         this.inputKeycodes = inputKeycodes;
         this.appKeys = Collections.unmodifiableList(appKeys);
         this.dockApps = Collections.unmodifiableList(dockApps);
@@ -122,9 +106,6 @@ final class Config {
         this.hiddenApps = Collections.unmodifiableList(hiddenApps);
         this.liveTvPackage = liveTvPackage;
         this.liveTvAction = liveTvAction;
-        this.launchActions = Collections.unmodifiableMap(launchActions);
-        this.appLabels = Collections.unmodifiableMap(appLabels);
-        this.appBanners = Collections.unmodifiableMap(appBanners);
         this.sourcePanelService = sourcePanelService;
         this.sourcePanelAction = sourcePanelAction;
         this.inputAction = inputAction;
@@ -154,8 +135,6 @@ final class Config {
         this.wallpaperDim = wallpaperDim;
         this.overlayApplied = overlayApplied;
         this.festival = festival;
-        this.raceCalendar = Collections.unmodifiableList(raceCalendar);
-        this.cinematicHome = cinematicHome;
     }
 
     /** The folder the theme tools push into; null when external storage is unavailable. */
@@ -170,9 +149,6 @@ final class Config {
         List<String> hidden = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.hidden_apps)));
         String liveTv = res.getString(R.string.live_tv_package).trim();
         String liveTvAction = res.getString(R.string.live_tv_action).trim();
-        List<String> launchActions = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.launch_actions)));
-        List<String> appLabels = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.app_labels)));
-        List<String> appBanners = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.app_banners)));
         String panelService = res.getString(R.string.source_panel_service).trim();
         String panelAction = res.getString(R.string.source_panel_action).trim();
         String inputAction = res.getString(R.string.input_action).trim();
@@ -197,7 +173,6 @@ final class Config {
         boolean settingsKeyPanel = res.getBoolean(R.bool.settings_key_panel);
         int[] inputKeycodes = res.getIntArray(R.array.input_key_keycodes);
         List<String> appKeys = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.app_keys)));
-        boolean cinematic = res.getBoolean(R.bool.cinematic_home);
         boolean applied = false;
 
         File dir = dir(ctx);
@@ -205,123 +180,67 @@ final class Config {
         JSONObject json = read(file);
         if (json != null) {
             applied = true;
-            dock = stringList(json, "dock_apps", dock);
-            fillDock = bool(json, "fill_dock", fillDock);
-            hidden = stringList(json, "hidden_apps", hidden);
-            liveTv = string(json, "live_tv_package", liveTv);
-            liveTvAction = string(json, "live_tv_action", liveTvAction);
-            launchActions = stringList(json, "launch_actions", launchActions);
-            appLabels = stringList(json, "app_labels", appLabels);
-            appBanners = stringList(json, "app_banners", appBanners);
-            panelService = string(json, "source_panel_service", panelService);
-            panelAction = string(json, "source_panel_action", panelAction);
-            inputAction = string(json, "input_action", inputAction);
-            columns = integer(json, "columns", columns, 1, 8);
-            rowsBelow = integer(json, "rows_below_dock", rowsBelow, 0, 3);
-            animations = bool(json, "animations", animations);
-            advancedEffects = bool(json, "advanced_effects", advancedEffects);
-            shamsi = bool(json, "shamsi_date", shamsi);
-            greetingName = string(json, "greeting_name", greetingName).trim();
-            moduleCards = bool(json, "module_cards", moduleCards);
-            reducedMotion = bool(json, "reduced_motion", reducedMotion);
-            dockTitle = bool(json, "dock_title", dockTitle);
-            dockRow = bool(json, "dock_row", dockRow);
-            reorderButton = bool(json, "reorder_button", reorderButton);
-            vpn = string(json, "vpn_app", vpn);
-            homeSettings = bool(json, "show_home_settings_shortcut", homeSettings);
-            showStats = bool(json, "show_stats", showStats);
-            library = bool(json, "app_library", library);
-            background = color(json, "background_color", background);
-            skyIntensity = integer(json, "sky_intensity", skyIntensity, 0, 100);
-            settingsKeycodes = intArray(json, "settings_key_keycodes", settingsKeycodes);
-            settingsKeyPanel = bool(json, "settings_key_panel", settingsKeyPanel);
-            inputKeycodes = intArray(json, "input_key_keycodes", inputKeycodes);
-            appKeys = stringList(json, "app_keys", appKeys);
-            cinematic = bool(json, "cinematic_home", cinematic);
+            dock = stringList(json, Contract.Key.DOCK_APPS, dock);
+            fillDock = bool(json, Contract.Key.FILL_DOCK, fillDock);
+            hidden = stringList(json, Contract.Key.HIDDEN_APPS, hidden);
+            liveTv = string(json, Contract.Key.LIVE_TV_PACKAGE, liveTv);
+            liveTvAction = string(json, Contract.Key.LIVE_TV_ACTION, liveTvAction);
+            panelService = string(json, Contract.Key.SOURCE_PANEL_SERVICE, panelService);
+            panelAction = string(json, Contract.Key.SOURCE_PANEL_ACTION, panelAction);
+            inputAction = string(json, Contract.Key.INPUT_ACTION, inputAction);
+            columns = integer(json, Contract.Key.COLUMNS, columns, Contract.Range.COLUMNS_MIN, Contract.Range.COLUMNS_MAX);
+            rowsBelow = integer(json, Contract.Key.ROWS_BELOW_DOCK, rowsBelow, Contract.Range.ROWS_BELOW_DOCK_MIN, Contract.Range.ROWS_BELOW_DOCK_MAX);
+            animations = bool(json, Contract.Key.ANIMATIONS, animations);
+            advancedEffects = bool(json, Contract.Key.ADVANCED_EFFECTS, advancedEffects);
+            shamsi = bool(json, Contract.Key.SHAMSI_DATE, shamsi);
+            greetingName = string(json, Contract.Key.GREETING_NAME, greetingName).trim();
+            moduleCards = bool(json, Contract.Key.MODULE_CARDS, moduleCards);
+            reducedMotion = bool(json, Contract.Key.REDUCED_MOTION, reducedMotion);
+            dockTitle = bool(json, Contract.Key.DOCK_TITLE, dockTitle);
+            dockRow = bool(json, Contract.Key.DOCK_ROW, dockRow);
+            reorderButton = bool(json, Contract.Key.REORDER_BUTTON, reorderButton);
+            vpn = string(json, Contract.Key.VPN_APP, vpn);
+            homeSettings = bool(json, Contract.Key.SHOW_HOME_SETTINGS_SHORTCUT, homeSettings);
+            showStats = bool(json, Contract.Key.SHOW_STATS, showStats);
+            library = bool(json, Contract.Key.APP_LIBRARY, library);
+            background = color(json, Contract.Key.BACKGROUND_COLOR, background);
+            skyIntensity = integer(json, Contract.Key.SKY_INTENSITY, skyIntensity, Contract.Range.SKY_INTENSITY_MIN, Contract.Range.SKY_INTENSITY_MAX);
+            settingsKeycodes = intArray(json, Contract.Key.SETTINGS_KEY_KEYCODES, settingsKeycodes);
+            settingsKeyPanel = bool(json, Contract.Key.SETTINGS_KEY_PANEL, settingsKeyPanel);
+            inputKeycodes = intArray(json, Contract.Key.INPUT_KEY_KEYCODES, inputKeycodes);
+            appKeys = stringList(json, Contract.Key.APP_KEYS, appKeys);
         }
         // A theme push or reset invalidates choices made on the TV. On first use, remember the
         // current theme without clearing choices from an older launcher version.
         SharedPreferences choices = ctx.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE);
         syncThemeChoices(choices, dir, file);
-        int chosenColumns = choices.getInt("columns", columns);
+        int chosenColumns = choices.getInt(Contract.Key.COLUMNS, columns);
         if (chosenColumns >= 4 && chosenColumns <= 7) columns = chosenColumns;
-        int chosenRows = choices.getInt(ROWS_BELOW_DOCK_KEY, rowsBelow);
-        if (chosenRows >= 0 && chosenRows <= 3) rowsBelow = chosenRows;
-        animations = choices.getBoolean("animations", animations);
-        advancedEffects = choices.getBoolean("advanced_effects", advancedEffects);
+        animations = choices.getBoolean(Contract.Key.ANIMATIONS, animations);
+        advancedEffects = choices.getBoolean(Contract.Key.ADVANCED_EFFECTS, advancedEffects);
+        background = choices.getInt(Contract.Key.BACKGROUND_COLOR, background);
         File wallpaper = dir != null ? new File(dir, WALLPAPER_NAME) : null;
         if (wallpaper != null && !(wallpaper.isFile() && wallpaper.length() > 0)) wallpaper = null;
         // A theme can also switch the wallpaper off while the file is still there.
-        boolean wallpaperEnabled = json == null || bool(json, "wallpaper", true);
+        boolean wallpaperEnabled = json == null || bool(json, Contract.Key.WALLPAPER, true);
         if (!wallpaperEnabled) wallpaper = null;
-        int rotationMinutes = json == null ? 0 : integer(json, "wallpaper_rotation_minutes", 0, 0, 1440);
-        int wallpaperDim = json == null ? 0 : integer(json, "wallpaper_dim", 0, 0, 90);
+        int rotationMinutes = json == null ? 0 : integer(json, Contract.Key.WALLPAPER_ROTATION_MINUTES, 0, Contract.Range.WALLPAPER_ROTATION_MINUTES_MIN, Contract.Range.WALLPAPER_ROTATION_MINUTES_MAX);
+        int wallpaperDim = json == null ? 0 : integer(json, Contract.Key.WALLPAPER_DIM, 0, Contract.Range.WALLPAPER_DIM_MIN, Contract.Range.WALLPAPER_DIM_MAX);
         List<File> wallpapers = new ArrayList<>();
         if (rotationMinutes > 0 && dir != null && wallpaperEnabled) {
-            wallpapers.addAll(WallpaperRotation.images(new File(dir, "wallpapers")));
+            wallpapers.addAll(WallpaperRotation.images(new File(dir, Contract.Theme.WALLPAPERS_DIRECTORY)));
         }
         if (wallpapers.isEmpty() && wallpaper != null) wallpapers.add(wallpaper);
-        // An on-TV wallpaper pick overrides the theme: a filename from the wallpapers/
-        // collection, or "none". Unset means the theme decides (off by default).
-        String wallpaperChoice = choices.getString(WALLPAPER_CHOICE_KEY, null);
-        if ("none".equals(wallpaperChoice)) {
-            wallpapers.clear();
-            wallpaper = null;
-            wallpaperEnabled = false;
-        } else if (wallpaperChoice != null && dir != null) {
-            File picked = WallpaperRotation.find(
-                    WallpaperRotation.images(new File(dir, "wallpapers")), wallpaperChoice);
-            if (picked == null && wallpaperChoice.equals(
-                    wallpaper != null ? wallpaper.getName() : "")) picked = wallpaper;
-            if (picked != null) {
-                wallpapers.clear();
-                wallpapers.add(picked);
-                wallpaper = picked;
-                wallpaperEnabled = true;
-            }
-        }
         // A festive skin comes only from a theme; config.xml has no festival.
-        Festival festival = json == null ? Festival.NONE : Festival.parse(string(json, "festival", ""),
-                string(json, "festival_until", ""), string(json, "greeting", ""), string(json, "accent_color", ""));
+        Festival festival = json == null ? Festival.NONE : Festival.parse(string(json, Contract.Key.FESTIVAL, ""),
+                string(json, Contract.Key.FESTIVAL_UNTIL, ""), string(json, Contract.Key.GREETING, ""), string(json, Contract.Key.ACCENT_COLOR, ""));
 
-        return new Config(dock, fillDock, hidden, liveTv, liveTvAction, packageMap(launchActions), packageMap(appLabels),
-                packageMap(appBanners), panelService,
-                panelAction, inputAction,
+        return new Config(dock, fillDock, hidden, liveTv, liveTvAction, panelService, panelAction, inputAction,
                 Math.max(1, columns), Math.max(0, rowsBelow), animations, advancedEffects,
                 shamsi, greetingName, moduleCards, reducedMotion, dockTitle, dockRow, reorderButton, vpn, homeSettings, showStats, library, background,
                 Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, wallpaperEnabled, wallpaper,
                 wallpapers, rotationMinutes, wallpaperDim, applied,
-                festival, inputKeycodes, appKeys, json == null ? Collections.emptyList() : raceCalendar(json), cinematic);
-    }
-
-    /**
-     * {@code "race_calendar": [{"round": 18, "name": "United States Grand Prix", "place": "Austin",
-     * "sessions": [{"name": "FP1", "start": "2026-10-23T17:30:00Z"}, ...]}, ...]}. A race or session that does
-     * not parse is left out on its own; the rest of the calendar still counts.
-     */
-    private static List<RaceWeekend.Race> raceCalendar(JSONObject json) {
-        List<RaceWeekend.Race> races = new ArrayList<>();
-        JSONArray list = json.optJSONArray("race_calendar");
-        if (list == null) return races;
-        for (int i = 0; i < list.length(); i++) {
-            JSONObject r = list.optJSONObject(i);
-            JSONArray sessions = r == null ? null : r.optJSONArray("sessions");
-            if (sessions == null) continue;
-            List<RaceWeekend.Session> parsed = new ArrayList<>();
-            for (int j = 0; j < sessions.length(); j++) {
-                JSONObject s = sessions.optJSONObject(j);
-                if (s == null) continue;
-                String name = s.optString("name", "").trim();
-                try {
-                    if (!name.isEmpty()) parsed.add(new RaceWeekend.Session(name, java.time.Instant.parse(s.optString("start", ""))));
-                } catch (java.time.format.DateTimeParseException ignored) {
-                    // a session without a readable start time cannot be counted down
-                }
-            }
-            if (!parsed.isEmpty()) races.add(new RaceWeekend.Race(r.optInt("round", 0),
-                    r.optString("name", "Grand Prix").trim(), r.optString("place", "").trim(), parsed));
-        }
-        return races;
+                festival, inputKeycodes, appKeys);
     }
 
     private static void syncThemeChoices(SharedPreferences choices, File dir, File config) {
@@ -333,12 +252,13 @@ final class Config {
             // Existing preferences survive an app upgrade, unless the first launch follows an
             // explicit theme push or reset by the updated tools.
             SharedPreferences.Editor editor = choices.edit();
-            if (!"absent".equals(token)) editor.remove("columns").remove("animations")
-                    .remove("advanced_effects").remove(ROWS_BELOW_DOCK_KEY).remove(WALLPAPER_CHOICE_KEY);
+            if (!"absent".equals(token)) editor.remove(Contract.Key.COLUMNS).remove(Contract.Key.ANIMATIONS)
+                    .remove(Contract.Key.ADVANCED_EFFECTS).remove(Contract.Key.BACKGROUND_COLOR)
+                    .remove(HomeLook.BACKDROP_KEY);
             editor.putString(THEME_SIGNATURE_KEY, signature).commit();
         } else if (!seen.equals(signature)) {
-            choices.edit().remove("columns").remove("animations").remove("advanced_effects")
-                    .remove(ROWS_BELOW_DOCK_KEY).remove(WALLPAPER_CHOICE_KEY)
+            choices.edit().remove(Contract.Key.COLUMNS).remove(Contract.Key.ANIMATIONS).remove(Contract.Key.ADVANCED_EFFECTS)
+                    .remove(Contract.Key.BACKGROUND_COLOR).remove(HomeLook.BACKDROP_KEY)
                     .putString(THEME_SIGNATURE_KEY, signature).commit();
         }
     }
@@ -361,7 +281,7 @@ final class Config {
     /** Reads and parses the overlay; any problem means "no overlay", never a crash on the home screen. */
     private static JSONObject read(File file) {
         if (file == null || !file.isFile()) return null;
-        if (file.length() > 64 * 1024) {
+        if (file.length() > Contract.Theme.MAX_CONFIG_BYTES) {
             Log.w(TAG, "ignoring " + file + ": larger than 64 KB");
             return null;
         }
@@ -417,18 +337,6 @@ final class Config {
             if (!(item instanceof Number)) return fallback;
             out[i] = ((Number) item).intValue();
             if (out[i] < 1) return fallback;
-        }
-        return out;
-    }
-
-    /** "package=value" entries; an entry without both halves is skipped, and a later entry for a package wins. */
-    static Map<String, String> packageMap(List<String> entries) {
-        Map<String, String> out = new HashMap<>();
-        for (String entry : entries) {
-            int eq = entry.indexOf('=');
-            if (eq <= 0) continue;
-            String pkg = entry.substring(0, eq).trim(), value = entry.substring(eq + 1).trim();
-            if (!pkg.isEmpty() && !value.isEmpty()) out.put(pkg, value);
         }
         return out;
     }

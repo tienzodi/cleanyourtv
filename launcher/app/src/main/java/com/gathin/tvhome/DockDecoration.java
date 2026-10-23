@@ -9,23 +9,39 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-/** Draws the tvOS style lighter band behind the first (dock) row and adds a gap below it. */
+/**
+ * Draws the M3 container behind the first (dock) row and adds a gap below it. The container is
+ * concentric with the tiles it holds: its radius is the tiles' resting radius plus its padding.
+ * It is see-through, so the backdrop shows in it, with a hairline edge that keeps its shape on a dark scheme.
+ */
 public class DockDecoration extends RecyclerView.ItemDecoration {
 
-    private final int dockSize;
+    /** Space between the tiles and the container's edge, on every side. */
+    static final float PADDING_DP = 12f;
+    private static final int BAND_ALPHA = 0xB3, EDGE_ALPHA = 0x80;
+
+    private int dockSize;
+    private boolean rtl;
     private final float density;
     private final Paint band = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint edge = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
 
-    /** @param translucent the cinematic shelf's band: the artwork and the glow show through it. */
-    DockDecoration(int dockSize, float density, boolean translucent) {
+    DockDecoration(int dockSize, float density) {
         this.dockSize = dockSize;
         this.density = density;
-        band.setColor(translucent ? 0x8C121014 : 0xFF141416);
         edge.setStyle(Paint.Style.STROKE);
-        edge.setStrokeWidth(density);
-        edge.setColor(translucent ? 0x26FFFFFF : 0x1FFFFFFF);
+        edge.setStrokeWidth(Math.max(1f, density / 2f));   // half a dp: one pixel on a 1080p TV
+        setPalette(Palette.currentOrBaseline());   // until Home applies its scheme
+    }
+
+    void setDockSize(int size) {
+        dockSize = size;
+    }
+
+    void setPalette(Palette p) {
+        band.setColor(Palette.alpha(p.surfaceContainerHigh, BAND_ALPHA));
+        edge.setColor(Palette.alpha(p.outlineVariant, EDGE_ALPHA));
     }
 
     @Override
@@ -33,14 +49,39 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
                                @NonNull RecyclerView.State state) {
         int pos = parent.getChildAdapterPosition(view);
         if (pos >= 0 && pos < dockSize) {
-            outRect.top = (int) (6 * density);
+            // Nothing above (the item's own 16dp holds the container's 12dp); below, 12dp more so the container
+            // ends 32dp above the next row's tiles, the grid's rhythm.
+            outRect.top = 0;
             outRect.bottom = (int) (12 * density);
+            // A dock with fewer apps than columns sits in the middle, like Apple's; the container hugs it.
+            int shift = centringShift(parent, state);
+            outRect.left = shift;
+            outRect.right = -shift;
         }
+    }
+
+    /** How far each dock tile moves so a short dock is centred: half the empty columns' width. */
+    private int centringShift(RecyclerView parent, RecyclerView.State state) {
+        RecyclerView.Adapter<?> adapter = parent.getAdapter();
+        if (adapter == null) return 0;
+        int tiles = 0;
+        int count = Math.min(dockSize, state.getItemCount());
+        for (int i = 0; i < count; i++) if (adapter.getItemViewType(i) == AppAdapter.TILE_VIEW) tiles++;
+        if (tiles == 0 || tiles >= dockSize) return 0;
+        float column = (parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight()) / (float) dockSize;
+        int shift = Math.round((dockSize - tiles) * column / 2f);
+        return rtl ? -shift : shift;
+    }
+
+    /** rtl_app_grid: the grid lays out right to left, so the tiles move left. */
+    void setRtl(boolean rtl) {
+        this.rtl = rtl;
     }
 
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         boolean any = false;
+        int cardWidth = 0;
         for (int i = 0; i < parent.getChildCount(); i++) {
             View child = parent.getChildAt(i);
             int pos = parent.getChildAdapterPosition(child);
@@ -52,6 +93,7 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
             float t = child.getTop() + card.getTop() + child.getTranslationY();
             float r = l + card.getWidth();
             float b = t + card.getHeight();
+            cardWidth = card.getWidth();
             if (!any) {
                 rect.set(l, t, r, b);
                 any = true;
@@ -60,14 +102,13 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
             }
         }
         if (!any) return;
-        float pad = 14 * density;
-        // The band can only draw inside the grid, and the first and last dock tiles sit 12dp in from its
-        // edges: a full 14dp at the sides sliced the rounded ends flat (#454). Keep the sides, with the
-        // 1dp edge line, inside the grid; the top and bottom have room.
-        float side = Math.max(0f, Math.min(pad, Math.min(rect.left, parent.getWidth() - rect.right) - density));
-        rect.inset(-side, -pad);
-        float radius = 26 * density;
+        float pad = PADDING_DP * density;
+        rect.inset(-pad, -pad);
+        // Concentric corners: outer radius = inner radius + padding.
+        float radius = AppAdapter.cornerRadius(cardWidth, density, Shapes.TILE_REST) + pad;
         c.drawRoundRect(rect, radius, radius, band);
-        c.drawRoundRect(rect, radius, radius, edge);
+        float half = edge.getStrokeWidth() / 2f;
+        rect.inset(half, half);
+        c.drawRoundRect(rect, radius - half, radius - half, edge);
     }
 }

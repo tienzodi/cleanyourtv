@@ -12,17 +12,6 @@
         android:layout_height="match_parent"
         android:importantForAccessibility="no" />
 
-    <!-- Cinematic top shelf (cinematic_home): the focused dock app's artwork, a few pixels across and
-         stretched over the screen, which softens it like a blur without the cost of one. Hidden otherwise. -->
-    <ImageView
-        android:id="@+id/heroArt"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:alpha="0"
-        android:visibility="gone"
-        android:importantForAccessibility="no" />
-
     <!-- Ambient glow in the colour of the focused dock app. -->
     <View
         android:id="@+id/ambient"
@@ -30,334 +19,287 @@
         android:layout_height="match_parent"
         android:alpha="0" />
 
-    <!-- Race-weekend panel (a theme's race_calendar, see RaceWeekend): in the free space under the clock,
-         shown only from shortly before a weekend's first session until the race is over. Updated once a
-         minute with the clock, never animated. -->
-    <LinearLayout
-        android:id="@+id/racePanel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="158dp"
-        android:orientation="vertical"
-        android:focusable="false"
-        android:importantForAccessibility="no"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <!-- A short kerb-red bar, the panel's one accent. -->
-            <View
-                android:layout_width="3dp"
-                android:layout_height="13dp"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/race_bar" />
-
-            <TextView
-                android:id="@+id/raceKicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:textColor="#B3FFFFFF"
-                android:textSize="12sp"
-                android:fontFamily="@font/outfit_medium"
-                android:letterSpacing="0.22"
-                android:textAllCaps="true" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/raceHeadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:singleLine="true"
-            android:textColor="#FFFFFFFF"
-            android:textSize="34sp"
-            android:fontFamily="@font/outfit_light"
-            android:letterSpacing="-0.01"
-            android:includeFontPadding="false" />
-
-        <TextView
-            android:id="@+id/raceSessions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:singleLine="true"
-            android:textColor="#99FFFFFF"
-            android:textSize="12sp"
-            android:fontFamily="@font/outfit_medium"
-            android:letterSpacing="0.12" />
-    </LinearLayout>
-
-    <!-- Cinematic top shelf: darkens the edge behind the shelf and the lower half, so the text and the
-         dock stay readable over the artwork. -->
-    <View
-        android:id="@+id/heroScrim"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:importantForAccessibility="no" />
-
     <!-- Top shelf: the focused dock app's name, positioned above the dock in code. -->
-    <LinearLayout
-        android:id="@+id/hero"
+    <TextView
+        android:id="@+id/heroName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="68dp"
-        android:orientation="vertical"
-        android:alpha="0">
+        android:alpha="0"
+        android:textColor="#FFFFFFFF"
+        android:textSize="45sp"
+        android:fontFamily="@font/sans_headline"
+        android:letterSpacing="-0.02"
+        android:includeFontPadding="false"
+        android:singleLine="true" />
 
-        <TextView
-            android:id="@+id/heroName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFFFF"
-            android:textSize="48sp"
-            android:fontFamily="@font/outfit_light"
-            android:letterSpacing="-0.02"
-            android:includeFontPadding="false"
-            android:singleLine="true" />
-
-        <!-- Cinematic shelf only: when the app was last opened, and the dock position dots. -->
-        <TextView
-            android:id="@+id/heroMeta"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="12dp"
-            android:singleLine="true"
-            android:textColor="#B3FFFFFF"
-            android:textSize="15sp"
-            android:fontFamily="@font/outfit_light"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/heroDots"
-            android:layout_width="wrap_content"
-            android:layout_height="6dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:visibility="gone" />
-    </LinearLayout>
-
-    <LinearLayout
+    <!-- The grid starts at the top of the screen: rows scroll up under the header, which floats over it
+         (HomeGrid.underlap keeps tiles at rest below the header). The wrapper clips at the grid's edge; the
+         grid itself must not clip so scaled tiles can overflow their cells. -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_marginStart="56dp"
+        android:layout_marginEnd="56dp">
+
+        <com.gathin.tvhome.HomeGrid
+            android:id="@+id/grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="10dp"
+            android:paddingBottom="40dp"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            android:descendantFocusability="afterDescendants" />
+    </FrameLayout>
+
+    <!-- Behind the header, over the grid: rows scrolled under the header fade into the page colour, more
+         towards the top. MainActivity sizes and paints it, and fades it in once the grid has scrolled. No
+         blur: these TVs' GPUs cannot afford one. -->
+    <View
+        android:id="@+id/headerScrim"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:importantForAccessibility="no" />
+
+    <!-- No clipping down to the pills: with advanced effects a focused pill scales up past its row. -->
+    <RelativeLayout
+        android:id="@+id/headerRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:paddingStart="56dp"
         android:paddingEnd="56dp"
         android:paddingTop="26dp"
         android:clipChildren="false"
         android:clipToPadding="false">
 
-        <!-- No clipping down to the pills: with advanced effects a focused pill scales up past its row. -->
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/leftBlock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false">
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/topButtons"
+            android:layout_marginEnd="16dp"
+            android:orientation="vertical">
 
+            <!-- The header texts use gravity left, not start: the launcher lays out left to right
+                 (no supportsRtl), and with start a right-to-left script such as Arabic would move to the
+                 right edge of these full-width lines instead of staying under the clock. -->
             <LinearLayout
-                android:id="@+id/leftBlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/topButtons"
-                android:layout_marginEnd="16dp"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:baselineAligned="true">
 
-                <!-- The header texts use gravity left, not start: the launcher lays out left to right
-                     (no supportsRtl), and with start a right-to-left script such as Arabic would move to the
-                     right edge of these full-width lines instead of staying under the clock. -->
-                <TextView
-                    android:id="@+id/greeting"
-                    android:gravity="left"
-                    android:layout_width="match_parent"
+                <TextClock
+                    android:id="@+id/clock"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:layout_marginStart="4dp"
-                    android:textColor="#8CFFFFFF"
-                    android:textSize="12sp"
-                    android:fontFamily="@font/outfit_medium"
-                    android:letterSpacing="0.22"
+                    android:format12Hour="h:mm"
+                    android:format24Hour="HH:mm"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="56sp"
+                    android:fontFamily="@font/sans_display"
+                    android:letterSpacing="-0.04"
+                    android:includeFontPadding="false" />
+
+                <TextClock
+                    android:id="@+id/ampm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="5dp"
+                    android:format12Hour="a"
+                    android:format24Hour=""
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/sans_medium"
+                    android:letterSpacing="0.08"
                     android:textAllCaps="true" />
 
+                <!-- Gone: the compact header sets the date beside the clock with only a gap. -->
+                <View
+                    android:id="@+id/clockDivider"
+                    android:visibility="gone"
+                    android:layout_width="1dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#33FFFFFF" />
+
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:baselineAligned="true">
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="24dp"
+                    android:orientation="vertical">
+
+                    <!-- At a Glance: the greeting and the date stacked beside the clock, centred on its
+                         digits (MainActivity.alignHeader). -->
+                    <TextView
+                        android:id="@+id/greeting"
+                        android:gravity="left"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                                                    android:textColor="#8CFFFFFF"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/sans_medium"
+                        android:letterSpacing="0.01" />
+
+                    <!-- Shamsi date ("27 Mehr 1405"), shown when shamsi_date is on. -->
+                    <TextView
+                        android:id="@+id/shamsiDate"
+                        android:gravity="left"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:textColor="#E6FFFFFF"
+                        android:textSize="17sp"
+                        android:fontFamily="@font/sans_regular"
+                        android:letterSpacing="0.02"
+                        android:includeFontPadding="false"
+                        android:visibility="gone" />
 
                     <TextClock
-                        android:id="@+id/clock"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/date"
+                        android:gravity="left"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:format12Hour="h:mm"
-                        android:format24Hour="HH:mm"
-                        android:textColor="#FFFFFFFF"
-                        android:textSize="52sp"
-                        android:fontFamily="@font/outfit_light"
-                        android:letterSpacing="-0.04"
-                        android:includeFontPadding="false" />
-
-                    <TextClock
-                        android:id="@+id/ampm"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="8dp"
-                        android:format12Hour="a"
-                        android:format24Hour=""
-                        android:textColor="#B3FFFFFF"
-                        android:textSize="15sp"
-                        android:fontFamily="@font/outfit_medium"
-                        android:letterSpacing="0.08"
-                        android:textAllCaps="true" />
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="26dp"
-                        android:layout_gravity="bottom"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="#33FFFFFF" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="9dp"
-                        android:orientation="vertical">
-
-                        <!-- Shamsi date ("27 Mehr 1405"), shown when shamsi_date is on. -->
-                        <TextView
-                            android:id="@+id/shamsiDate"
-                            android:gravity="left"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:textColor="#E6FFFFFF"
-                            android:textSize="17sp"
-                            android:fontFamily="@font/outfit_regular"
-                            android:letterSpacing="0.02"
-                            android:includeFontPadding="false"
-                            android:visibility="gone" />
-
-                        <TextClock
-                            android:id="@+id/date"
-                            android:gravity="left"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:singleLine="@bool/date_single_line"
-                            android:maxLines="2"
-                            android:lineSpacingExtra="6dp"
-                            android:ellipsize="end"
-                            android:format12Hour="@string/date_format_home"
-                            android:format24Hour="@string/date_format_home"
-                            android:textColor="#A6FFFFFF"
-                            android:textSize="14sp"
-                            android:fontFamily="@font/outfit_regular"
-                            android:letterSpacing="0.14"
-                            android:textAllCaps="true" />
-                    </LinearLayout>
+                        android:singleLine="@bool/date_single_line"
+                        android:maxLines="2"
+                        android:lineSpacingExtra="6dp"
+                        android:ellipsize="end"
+                        android:format12Hour="@string/date_format_home"
+                        android:format24Hour="@string/date_format_home"
+                        android:textColor="#A6FFFFFF"
+                        android:layout_marginTop="2dp"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/sans_regular"
+                        android:letterSpacing="0.03" />
                 </LinearLayout>
-
             </LinearLayout>
 
-            <!-- Shown only when show_stats is on. Outside leftBlock, so the top buttons stay level with the clock
-                 row; gone, it takes no space. -->
+        </LinearLayout>
+
+        <!-- Shown only when show_stats is on. Outside leftBlock, so the top buttons stay level with the clock
+             row; gone, it takes no space. -->
+        <TextView
+            android:id="@+id/stats"
+            android:layout_width="0dp"
+            android:layout_below="@id/leftBlock"
+            android:layout_alignStart="@id/leftBlock"
+            android:layout_alignEnd="@id/leftBlock"
+            android:gravity="left"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="#D9FFFFFF"
+            android:textSize="14sp"
+            android:fontFamily="@font/sans_medium"
+            android:letterSpacing="0.04"
+            android:focusable="false"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/topButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/leftBlock"
+            android:layout_marginBottom="6dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="horizontal">
+
             <TextView
-                android:id="@+id/stats"
-                android:layout_width="0dp"
-                android:layout_below="@id/leftBlock"
-                android:layout_alignStart="@id/leftBlock"
-                android:layout_alignEnd="@id/leftBlock"
-                android:gravity="left"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:id="@+id/btnInputs"
+                style="@style/TopButton"
+                android:text="@string/inputs"
+                android:drawableStart="@drawable/ic_input"
+                android:nextFocusDown="@+id/grid" />
+
+            <TextView
+                android:id="@+id/btnWifi"
+                style="@style/TopButton"
+                android:maxWidth="180dp"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="#D9FFFFFF"
-                android:textSize="14sp"
-                android:fontFamily="@font/outfit_medium"
-                android:letterSpacing="0.04"
-                android:focusable="false"
-                android:visibility="gone" />
+                android:text="@string/wifi"
+                android:drawableStart="@drawable/ic_wifi"
+                android:nextFocusDown="@+id/grid" />
 
-            <LinearLayout
-                android:id="@+id/topButtons"
+            <TextView
+                android:id="@+id/btnReorder"
+                style="@style/TopButtonIcon"
+                android:contentDescription="@string/reorder"
+                android:drawableStart="@drawable/ic_swap_vert"
+                android:nextFocusDown="@+id/grid" />
+
+            <TextView
+                android:id="@+id/btnSettings"
+                style="@style/TopButton"
+                android:text="@string/launcher_settings"
+                android:drawableStart="@drawable/ic_settings"
+                android:nextFocusDown="@+id/grid" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Edit Home's floating toolbar (M3E): what OK and Back do right now. Not focusable; MainActivity
+         colours it (secondaryContainer) and shows it only while the mode is on. -->
+    <LinearLayout
+        android:id="@+id/editBar"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="28dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/editBarIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="14dp"
+            android:src="@drawable/ic_swap_vert_filled" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/editBarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@id/leftBlock"
-                android:layout_marginBottom="6dp"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:orientation="horizontal">
+                android:fontFamily="@font/sans_medium"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/btnInputs"
-                    style="@style/TopButton"
-                    android:text="@string/inputs"
-                    android:drawableStart="@drawable/ic_input"
-                    android:nextFocusDown="@+id/grid" />
-
-                <TextView
-                    android:id="@+id/btnWifi"
-                    style="@style/TopButton"
-                    android:maxWidth="180dp"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:text="@string/wifi"
-                    android:drawableStart="@drawable/ic_wifi"
-                    android:nextFocusDown="@+id/grid" />
-
-                <TextView
-                    android:id="@+id/btnReorder"
-                    style="@style/TopButtonIcon"
-                    android:contentDescription="@string/reorder"
-                    android:drawableStart="@drawable/ic_swap_vert"
-                    android:nextFocusDown="@+id/grid" />
-
-                <TextView
-                    android:id="@+id/btnSettings"
-                    style="@style/TopButton"
-                    android:text="@string/settings"
-                    android:drawableStart="@drawable/ic_settings"
-                    android:nextFocusDown="@+id/grid" />
-            </LinearLayout>
-        </RelativeLayout>
-
-        <!-- The wrapper clips at the grid's edge; the grid itself must not clip so scaled tiles can overflow their cells. -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="10dp">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/grid"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="10dp"
-                android:paddingBottom="40dp"
-                android:clipToPadding="false"
-                android:clipChildren="false"
-                android:overScrollMode="never"
-                android:scrollbars="none"
-                android:descendantFocusability="afterDescendants" />
-        </FrameLayout>
+            <TextView
+                android:id="@+id/editBarHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:fontFamily="@font/sans_regular"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- The single floating glass highlight that springs between tiles. -->

@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/glass_panel"
+    android:tag="m3:panel"
     android:paddingStart="26dp"
     android:paddingEnd="26dp"
     android:paddingTop="22dp"
@@ -20,7 +21,7 @@
         android:ellipsize="end"
         android:textColor="#FFFFFFFF"
         android:textSize="22sp"
-        android:fontFamily="@font/outfit_medium"
+        android:fontFamily="@font/sans_medium"
         android:letterSpacing="-0.01" />
 
     <TextView
@@ -31,7 +32,7 @@
         android:textColor="#D9FFFFFF"
         android:textSize="15sp"
         android:lineSpacingExtra="3sp"
-        android:fontFamily="@font/outfit" />
+        android:fontFamily="@font/sans_regular" />
 
     <TextView
         android:id="@+id/names"
@@ -41,7 +42,7 @@
         android:textColor="#D9FFFFFF"
         android:textSize="15sp"
         android:lineSpacingExtra="3sp"
-        android:fontFamily="@font/outfit" />
+        android:fontFamily="@font/sans_regular" />
 
     <TextView
         android:id="@+id/hint"
@@ -51,7 +52,7 @@
         android:text="@string/card_prompt_hint"
         android:textColor="#99FFFFFF"
         android:textSize="13sp"
-        android:fontFamily="@font/outfit" />
+        android:fontFamily="@font/sans_regular" />
 
     <TextView
         android:id="@+id/identity"
@@ -62,7 +63,7 @@
         android:textColor="#80FFFFFF"
         android:textSize="12sp"
         android:letterSpacing="0.03"
-        android:fontFamily="@font/outfit" />
+        android:fontFamily="@font/sans_regular" />
 
     <LinearLayout
         android:layout_width="match_parent"

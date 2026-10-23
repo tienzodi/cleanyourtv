@@ -60,7 +60,7 @@ echo "Stock launcher: $STOCK_LAUNCHER"
 HOME_QUERY='cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME'
 if [ "$STOCK_LAUNCHER" = none ]; then DISABLE_STOCK="echo stock launcher left alone"
 else DISABLE_STOCK="pm disable-user --user 0 $STOCK_LAUNCHER"; fi
-APK=app/build/outputs/apk/release/app-release.apk
+APK=app/build/outputs/apk/release/km-launcher.apk
 "$PY" -I ../tools/b64push.py "$APK" /data/local/tmp/tvhome.apk
 # Install on its own: in the batch below a failed install (e.g. "not enough space" on a full /data)
 # would not stop the stock launcher from being disabled.
@@ -84,6 +84,8 @@ if ! printf '%s' "$START_OUT" | grep -qF 'Status: ok' || printf '%s' "$START_OUT
 fi
 printf '%s\n' \
   "pm grant com.gathin.tvhome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; echo location-granted" \
+  "pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; echo secure-settings-granted" \
+  "appops set com.gathin.tvhome REQUEST_INSTALL_PACKAGES allow 2>/dev/null; echo install-packages-allowed" \
   "cmd package compile -m speed -f com.gathin.tvhome" \
   "$DISABLE_STOCK" \
   "cmd package set-home-activity --user 0 com.gathin.tvhome/.MainActivity" \

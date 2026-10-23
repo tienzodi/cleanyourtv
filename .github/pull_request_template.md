@@ -11,6 +11,6 @@
 ### If this touches the launcher
 - [ ] Verified on a real TV, screenshot attached
 - [ ] D-pad checked from every edge (Up, Down, Left, Right)
-- [ ] No network, no background service, no new permission
-- [ ] New strings in `values/strings.xml` and the other `values-*` folders
+- [ ] No new network endpoint, no background service, no new permission
+- [ ] New strings in `values/strings.xml` and `values-vi/strings.xml`
 - [ ] Anything TV-specific is in `config.xml` or a theme, not in code

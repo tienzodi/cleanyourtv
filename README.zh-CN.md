@@ -196,7 +196,7 @@ TV_HOST=192.168.1.50 tools/theme.sh --reset
 
 以下 ADB 命令使用 macOS/Linux 的虚拟环境路径；Windows 将前缀 `tools/venv/bin/python -I tools/tv.py` 换为 `tools\venv\Scripts\python.exe -I tools\tv.py`。
 
-- **语言**随电视系统切换，包括简体中文和繁体中文。Android 13 及以上也支持单独设置应用语言，例如：`tools/venv/bin/python -I tools/tv.py 'cmd locale set-app-locales com.gathin.tvhome --locales zh-CN'`。
+- **语言**随电视系统切换，目前只有英文和越南文；欢迎为新的字符串补充中文翻译。Android 13 及以上也支持单独设置应用语言，例如：`tools/venv/bin/python -I tools/tv.py 'cmd locale set-app-locales com.gathin.tvhome --locales zh-CN'`。
 - **时钟屏保**可在电视的屏保设置中选择 Clock；也可执行：`tools/venv/bin/python -I tools/tv.py 'settings put secure screensaver_components com.gathin.tvhome/.ClockDream; settings put secure screensaver_enabled 1'`。
 - **输入源键**可在 macOS/Linux 安装时使用 `INPUT_KEY_SERVICE=1` 启用辅助功能服务，以适配 Google TV 的遥控器输入源按钮；Windows 使用 `-InputKeyService`。
 - **HOME / 设置键**可在 macOS/Linux 安装时使用 `HOME_KEY_SERVICE=1`，并通过 `config.xml` 中的按键配置适配部分设备；Windows 使用 `-HomeKeyService`。`settings_key_panel` 可启用快捷设置面板，提供电视设置、显示、网络、应用和桌面设置入口。重装时需重新传入所需的服务选项。

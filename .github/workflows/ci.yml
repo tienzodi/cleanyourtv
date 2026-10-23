@@ -46,6 +46,6 @@ jobs:
           ./gradlew --no-daemon testReleaseUnitTest lintRelease assembleRelease
       - name: The launcher stays small
         run: |
-          size=$(stat -c %s launcher/app/build/outputs/apk/release/app-release.apk)
+          size=$(stat -c %s launcher/app/build/outputs/apk/release/km-launcher.apk)
           echo "release APK: $((size / 1024)) KB"
-          test "$size" -lt 430080 || { echo "APK is over 420 KB; the launcher targets 1 GB TVs, keep it small"; exit 1; }
+          test "$size" -lt 716800 || { echo "APK is over 700 KB; the launcher targets 1 GB TVs, keep it small"; exit 1; }

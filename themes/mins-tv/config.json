@@ -1,8 +1,13 @@
 {
-  "background_color": "#10141E",
+  "background_color": "#FDF4DE",
   "wallpaper": true,
   "sky_intensity": 0,
-  "dock_apps": ["com.google.android.youtube.tv", "com.netflix.ninja", "com.android.vending", "com.viettel.tv360.tv"],
+  "dock_apps": [
+    "com.google.android.youtube.tv",
+    "com.netflix.ninja",
+    "com.android.vending",
+    "com.viettel.tv360.tv"
+  ],
   "fill_dock": false,
   "hidden_apps": [
     "com.amazon.amazonvideo.livingroom",
@@ -19,5 +24,6 @@
     "com.sony.dtv.tvxlauncher.programguide",
     "com.vewd.core.integration.dia",
     "screnmirroring.com"
-  ]
+  ],
+  "advanced_effects": true
 }

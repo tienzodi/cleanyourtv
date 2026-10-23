@@ -17,7 +17,7 @@ powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -TvHost 192.168.1.50 th
 | `default/` | The built-in look written out as JSON, as a starting point for your own |
 | `aurora/` | A dark aurora wallpaper (teal and violet on navy, darker at the bottom) with a matching background colour |
 | `dussehra/` | Festive skin for Dussehra (ends 21 Oct 2026): a marigold toran, a faint gold rangoli, a diya for Wi-Fi, a bell for Inputs, a marigold for Settings and a petal shower |
-| `mins-tv/` | A personal theme for a Sony KD-49X7500F: a pixel-art wallpaper (father and daughter at a street-food table) set in the top of the frame on a dark navy background, a four-app dock (YouTube, Netflix, Play Store, TV360) and every other Sony and Google app hidden |
+| `mins-tv/` | A personal theme for a Sony KD-49X7500F: a pixel-art picture (father and daughter at a street-food table) on the right of a cream background, so the widget cards on the left do not cover it; a four-app dock (YouTube, Netflix, Play Store, TV360) and every other Sony and Google app hidden |
 | `pixel/` | A retro 8-bit night skyline wallpaper with a matching navy background; the time-of-day backdrop stays off so the flat colours stay flat |
 | `six-columns/` | Six smaller tiles per row and one grid row visible under the dock |
 
@@ -25,6 +25,8 @@ powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -TvHost 192.168.1.50 th
 
 Every key is optional; a missing key keeps the value from `config.xml`, an unknown or wrongly typed key
 is ignored, and a file that doesn't parse is ignored as a whole, so a theme can never break Home.
+
+The launcher checks keys, types and ranges against [`launcher/contract.json`](../launcher/contract.json); that file is the authority when this table and the code disagree. The same contract caps `config.json` at 64 KB and each wallpaper at 10 MB.
 
 | Key | Type | Meaning |
 |---|---|---|

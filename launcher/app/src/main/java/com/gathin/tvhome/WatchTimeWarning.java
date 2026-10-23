@@ -46,9 +46,15 @@ final class WatchTimeWarning {
         return instance;
     }
 
-    /** A window of {@code pkg} came to the front, reported by {@code from}. */
-    void onWindow(AccessibilityService from, CharSequence pkg) {
+    /**
+     * A window of {@code pkg}, whose root is {@code className}, came to the front, reported by {@code from}.
+     * The card's own window is reported too (as this package with a plain view class, not an activity),
+     * and must not count as leaving YouTube, or it would remove itself the moment it appeared.
+     */
+    void onWindow(AccessibilityService from, CharSequence pkg, CharSequence className) {
         for (String overlay : InputKeyService.SYSTEM_OVERLAYS) if (overlay.contentEquals(pkg)) return;
+        if (from.getPackageName().contentEquals(pkg)
+                && (className == null || !className.toString().endsWith("Activity"))) return;
         service = new WeakReference<>(from);
         if (WATCHED_PACKAGE.contentEquals(pkg)) {
             if (!watching) {
